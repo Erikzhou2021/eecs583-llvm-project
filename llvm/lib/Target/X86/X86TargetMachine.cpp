@@ -69,6 +69,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeX86Target() {
   RegisterTargetMachine<X86TargetMachine> Y(getTheX86_64Target());
 
   PassRegistry &PR = *PassRegistry::getPassRegistry();
+  initializeX86MachineInstrPrinterPass(PR);
   initializeX86LowerAMXIntrinsicsLegacyPassPass(PR);
   initializeX86LowerAMXTypeLegacyPassPass(PR);
   initializeX86PreTileConfigPass(PR);
@@ -533,6 +534,7 @@ void X86PassConfig::addPreRegAlloc() {
   addPass(createX86SpeculativeLoadHardeningPass());
   addPass(createX86FlagsCopyLoweringPass());
   addPass(createX86DynAllocaExpander());
+  addPass(createX86MachineInstrPrinter());
 
   if (getOptLevel() != CodeGenOptLevel::None)
     addPass(createX86PreTileConfigPass());
