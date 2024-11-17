@@ -6,27 +6,27 @@
 
 using namespace llvm;
 
-#define X86_MACHINEINSTR_PRINTER_PASS_NAME "Dummy X86 machineinstr printer pass"
+#define PASS_NAME "Machine instruction printer after reg alloc"
 
 namespace {
 
-class X86MachineInstrPrinter : public MachineFunctionPass {
+class PrintAfterRegAlloc : public MachineFunctionPass {
 public:
     static char ID;
 
-    X86MachineInstrPrinter() : MachineFunctionPass(ID) {
-        initializeX86MachineInstrPrinterPass(*PassRegistry::getPassRegistry());
+    PrintAfterRegAlloc() : MachineFunctionPass(ID) {
+        initializePrintAfterRegAllocPass(*PassRegistry::getPassRegistry());
     }
 
     bool runOnMachineFunction(MachineFunction &MF) override;
 
-    StringRef getPassName() const override { return X86_MACHINEINSTR_PRINTER_PASS_NAME; }
+    StringRef getPassName() const override { return PASS_NAME; }
 };
 
-char X86MachineInstrPrinter::ID = 0;
+char PrintAfterRegAlloc::ID = 0;
 
-bool X86MachineInstrPrinter::runOnMachineFunction(MachineFunction &MF) {
-    
+bool PrintAfterRegAlloc::runOnMachineFunction(MachineFunction &MF) {
+    errs() << "After \n --------------------------------------------- \n";
     for (auto &MBB : MF) {
         errs() << "Analyzing Basic Block: " << MBB.getName() << "\n";
         for (auto &MI : MBB) { // for each instruction in the basic block
@@ -60,11 +60,11 @@ bool X86MachineInstrPrinter::runOnMachineFunction(MachineFunction &MF) {
 //     true, // is CFG only?
 //     true  // is analysis?
 // )
-INITIALIZE_PASS_BEGIN(X86MachineInstrPrinter, "x86-machineinstr-printer", X86_MACHINEINSTR_PRINTER_PASS_NAME, false, false)
-INITIALIZE_PASS_END(X86MachineInstrPrinter, "x86-machineinstr-printer", X86_MACHINEINSTR_PRINTER_PASS_NAME, false, false)
+INITIALIZE_PASS_BEGIN(PrintAfterRegAlloc, "x86-machineinstr-printer", PASS_NAME, true, true)
+INITIALIZE_PASS_END(PrintAfterRegAlloc, "x86-machineinstr-printer", PASS_NAME, true, true)
 
 namespace llvm {
 
-FunctionPass *createX86MachineInstrPrinter() { return new X86MachineInstrPrinter(); }
+    FunctionPass *createprintAfterRegAlloc() { return new PrintAfterRegAlloc(); }
 
 }

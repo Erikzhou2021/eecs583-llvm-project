@@ -25,8 +25,11 @@ class X86RegisterBankInfo;
 class X86Subtarget;
 class X86TargetMachine;
 
-FunctionPass *createX86MachineInstrPrinter();
-void initializeX86MachineInstrPrinterPass(PassRegistry &);
+FunctionPass *createPrintBeforeRegAlloc();
+void initializePrintBeforeRegAllocPass(PassRegistry &);
+
+FunctionPass *createprintAfterRegAlloc();
+void initializePrintAfterRegAllocPass(PassRegistry &);
 
 /// This pass converts a legalized DAG into a X86-specific DAG, ready for
 /// instruction scheduling.

@@ -69,7 +69,8 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeX86Target() {
   RegisterTargetMachine<X86TargetMachine> Y(getTheX86_64Target());
 
   PassRegistry &PR = *PassRegistry::getPassRegistry();
-  initializeX86MachineInstrPrinterPass(PR);
+  initializePrintBeforeRegAllocPass(PR);
+  initializePrintAfterRegAllocPass(PR);
   initializeX86LowerAMXIntrinsicsLegacyPassPass(PR);
   initializeX86LowerAMXTypeLegacyPassPass(PR);
   initializeX86PreTileConfigPass(PR);
@@ -534,7 +535,7 @@ void X86PassConfig::addPreRegAlloc() {
   addPass(createX86SpeculativeLoadHardeningPass());
   addPass(createX86FlagsCopyLoweringPass());
   addPass(createX86DynAllocaExpander());
-  addPass(createX86MachineInstrPrinter());
+  addPass(createPrintBeforeRegAlloc());
 
   if (getOptLevel() != CodeGenOptLevel::None)
     addPass(createX86PreTileConfigPass());
@@ -548,6 +549,7 @@ void X86PassConfig::addMachineSSAOptimization() {
 }
 
 void X86PassConfig::addPostRegAlloc() {
+  addPass(createprintAfterRegAlloc());
   addPass(createX86LowerTileCopyPass());
   addPass(createX86FloatingPointStackifierPass());
   // When -O0 is enabled, the Load Value Injection Hardening pass will fall back
