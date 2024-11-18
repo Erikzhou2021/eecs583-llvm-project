@@ -28,26 +28,18 @@ char PrintAfterRegAlloc::ID = 0;
 bool PrintAfterRegAlloc::runOnMachineFunction(MachineFunction &MF) {
     errs() << "After \n --------------------------------------------- \n";
     for (auto &MBB : MF) {
-        errs() << "Analyzing Basic Block: " << MBB.getName() << "\n";
         for (auto &MI : MBB) { // for each instruction in the basic block
-            errs() << "  Instruction: " << MI << "\n";
+            // errs() << "  Instruction: " << MI << "\n";
+            errs() << MI.getOpcode() << " ";
             for (unsigned i = 0; i < MI.getNumOperands(); ++i) { // for each operand in the instruction
                 MachineOperand &MO = MI.getOperand(i);
-                // getReg() returns a Register object
-                if (MO.isReg() && MO.getReg().isVirtual()) { // if operand is a virtual register
-                    unsigned VirtReg = MO.getReg(); // get virtual register
-                    // if (MRI.isVirtualRegister(VirtReg)) {
-                    // unsigned PhysReg = MRI.getRegAllocHint(VirtReg).first; // get corresponding physical register
-                    errs() << "    Virtual Register %" << VirtReg
-                        << " has no mapping.\n";
-                    // }
-                }
-                if(MO.isReg() && MO.getReg().isPhysical()){
-                    unsigned PhysReg = MO.getReg();
-                    errs() << " Physical Register %" << PhysReg << "\n";
+                if(MO.isReg() && MO.getReg().id() != 0){
+                    errs() << MO.getReg() << " ";
                 }
             }
+            errs() << ", ";
         }
+        errs() << "\n";
     }
 
     return false;

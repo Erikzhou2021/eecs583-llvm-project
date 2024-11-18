@@ -39,9 +39,9 @@ main:                                   # @main
 	jg	.LBB0_5
 # %bb.2:                                #   in Loop: Header=BB0_1 Depth=1
 	movslq	-8(%rbp), %rax
-	movl	-112(%rbp,%rax,4), %eax
-	leal	(%rax,%rax,4), %ecx
-	leal	(%rax,%rcx,2), %eax
+	movl	-112(%rbp,%rax,4), %ecx
+	leal	(%rcx,%rcx,4), %eax
+	leal	(%rcx,%rax,2), %eax
 	movslq	-4(%rbp), %rcx
 	addl	%ecx, %eax
 	movl	%eax, -64(%rbp,%rcx,4)
