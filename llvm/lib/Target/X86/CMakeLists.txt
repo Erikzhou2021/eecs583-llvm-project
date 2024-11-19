@@ -25,6 +25,8 @@ add_public_tablegen_target(X86CommonTableGen)
 set(sources
   postRegAllocPass.cpp
   preRegAllocPass.cpp
+  Symbolic.cpp
+  utils.cpp
   X86ArgumentStackSlotRebase.cpp
   X86AsmPrinter.cpp
   X86AvoidTrailingCall.cpp
