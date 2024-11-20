@@ -29,7 +29,7 @@ def print_tokens(bb_tokens):
         print('\n')
 
 
-def tokenized_format(input_file):
+def tokenized_format(input_file, state="pre"):
     """
     1.  Converts the pre pass into a tokenized format.
         Format:
@@ -46,20 +46,20 @@ def tokenized_format(input_file):
     Output: a list of lists, where each inner list is a basic block
     """
     with open(input_file, "r") as f:
-        bb_tokens_pre = []
-        bb_tokens_post = []
+        bb_tokens = []
         txt = f.read()
         pre, post = txt.split('~')
         
-        # pre-reg-alloc
-        basic_blocks = pre.strip().split('\n')
-        for i, bb in enumerate(basic_blocks):
-            bb_tokens_pre.append(tokenize_bb(bb, i))
-        
+        if state == "pre":
+            # pre-reg-alloc
+            basic_blocks = pre.strip().split('\n')
+            for i, bb in enumerate(basic_blocks):
+                bb_tokens.append(tokenize_bb(bb, i))
+        else:
         # post-reg-alloc
         basic_blocks = post.strip().split('\n')
         for i, bb in enumerate(basic_blocks):
-            bb_tokens_post.append(tokenize_bb(bb, i))
+            bb_tokens.append(tokenize_bb(bb, i))
     return bb_tokens_pre, bb_tokens_post
         
 
