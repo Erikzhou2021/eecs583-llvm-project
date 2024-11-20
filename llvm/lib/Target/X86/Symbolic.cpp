@@ -45,7 +45,7 @@ MIR2Vec_Symbolic::MIR2Vec_Symbolic(std::string vocab, unsigned WO, unsigned WA)
 
 bool MIR2Vec_Symbolic::getValue(std::string key, Vector &value) {
   if (opcMap.find(key) == opcMap.end()) {
-    errs() << "cannot find key in map : " << key << "\n";
+    // errs() << "cannot find key in map : " << key << "\n";
     return false;
   } else
     value = opcMap[key];
@@ -56,6 +56,7 @@ void MIR2Vec_Symbolic::generateSymbolicEncodings(MachineFunction &F,
                                                  std::ostream *o) {
   int noOfFunc = 0;
   static bool run = false;
+  std::ofstream outfile ("vectorized.txt", std::ios::app);
   if (!run) {
     opcDescMap =
         IR2Vec::createOpcodeMap(F.getTarget().getTargetTriple().getArch());
@@ -77,17 +78,18 @@ void MIR2Vec_Symbolic::generateSymbolicEncodings(MachineFunction &F,
         __cxa_demangle(funcName.c_str(), 0, &sz, &status);
     auto demangledName = status == 0 ? std::string(readable_name) : funcName;
 
-    res += F.getMMI().getModule()->getSourceFileName() + "__" + demangledName +
-           "\t";
+    // res += F.getMMI().getModule()->getSourceFileName() + "__" + demangledName +
+    //        "\t";
 
-    res += "=\t";
+    // res += "=\t";
     for (auto i : tmp) {
       if ((i <= 0.0001 && i > 0) || (i < 0 && i >= -0.0001)) {
         i = 0;
       }
-      res += std::to_string(i) + "\t";
+      res += std::to_string(i) + ",";
     }
-    res += "\n";
+    res[res.length()-1] = '\n';
+    // res += "\n";
 
     // }
 
@@ -96,10 +98,13 @@ void MIR2Vec_Symbolic::generateSymbolicEncodings(MachineFunction &F,
 
   LLVM_DEBUG(errs() << "Number of functions written = " << noOfFunc << "\n");
 
-  if (o)
-    *o << res;
+  // if (o)
+  //   *o << res;
 
-  errs() << "res = " << res;
+  // errs() << res;
+
+  outfile << res;
+  outfile.close();
 }
 
 Vector
