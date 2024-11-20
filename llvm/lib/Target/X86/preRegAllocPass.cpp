@@ -3,7 +3,8 @@
 #include "llvm/CodeGen/MachineFunctionPass.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "Symbolic.h"
-// #include "llvm/Target/TargetRegisterInfo.h"
+#include "llvm/CodeGen/MachineInstr.h"
+#include "llvm/CodeGen/TargetInstrInfo.h"
 
 #include "llvm/MC/MCInst.h"
 #include "llvm/MC/MCInstPrinter.h"
@@ -63,6 +64,32 @@ bool PrintBeforeRegAlloc::runOnMachineFunction(MachineFunction &MF) {
 
     return false;
 }
+
+// bool PrintBeforeRegAlloc::runOnMachineFunction(MachineFunction &MF) {
+//     errs() << "Before \n --------------------------------------------- \n";
+//     for (auto &MBB : MF) {
+//         // errs() << "Analyzing Basic Block: " << MBB.getName() << "\n";
+//         for (auto &MI : MBB) { // for each instruction in the basic block
+//             // errs() << "  Instruction: " << MI << "\n";
+//             errs() << MI.getOpcode() << " ";
+//             for (unsigned i = 0; i < MI.getNumOperands(); ++i) { // for each operand in the instruction
+//                 MachineOperand &MO = MI.getOperand(i);
+//                 if(MO.isReg() && MO.getReg().id() != 0){
+//                     if(MO.getReg().isVirtual()){
+//                         errs() << MO.getReg().virtRegIndex() << " ";
+//                     }
+//                     else{
+//                         errs() << MO.getReg() << " ";
+//                     }
+//                 }
+//             }
+//             errs() << ", ";
+//         }
+//         errs() << "\n";
+//     }
+
+//     return false;
+// }
 
 } // end of anonymous namespace
 

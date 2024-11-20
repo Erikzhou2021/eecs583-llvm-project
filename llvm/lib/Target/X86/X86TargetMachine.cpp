@@ -548,7 +548,6 @@ void X86PassConfig::addMachineSSAOptimization() {
 }
 
 void X86PassConfig::addPostRegAlloc() {
-  addPass(createprintAfterRegAlloc());
   addPass(createX86LowerTileCopyPass());
   addPass(createX86FloatingPointStackifierPass());
   // When -O0 is enabled, the Load Value Injection Hardening pass will fall back
@@ -557,6 +556,7 @@ void X86PassConfig::addPostRegAlloc() {
   // analyses needed by the LVIHardening pass when compiling at -O0.
   if (getOptLevel() != CodeGenOptLevel::None)
     addPass(createX86LoadValueInjectionLoadHardeningPass());
+  addPass(createprintAfterRegAlloc());
 }
 
 void X86PassConfig::addPreSched2() {
