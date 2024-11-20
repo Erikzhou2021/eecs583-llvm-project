@@ -2,6 +2,8 @@
 #include "X86InstrInfo.h"
 #include "llvm/CodeGen/MachineFunctionPass.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
+#include "llvm/CodeGen/MachineInstr.h"
+#include "llvm/CodeGen/TargetInstrInfo.h"
 // #include "llvm/Target/TargetRegisterInfo.h"
 
 using namespace llvm;
@@ -26,30 +28,70 @@ public:
 char PrintBeforeRegAlloc::ID = 0;
 
 bool PrintBeforeRegAlloc::runOnMachineFunction(MachineFunction &MF) {
-    errs() << "Before \n --------------------------------------------- \n";
+    // errs() << "Before \n --------------------------------------------- \n";
+    const llvm::TargetInstrInfo *TII = MF.getSubtarget().getInstrInfo();
     for (auto &MBB : MF) {
         // errs() << "Analyzing Basic Block: " << MBB.getName() << "\n";
         for (auto &MI : MBB) { // for each instruction in the basic block
             // errs() << "  Instruction: " << MI << "\n";
-            errs() << MI.getOpcode() << " ";
+            errs() << TII->getName(MI.getOpcode()) << "|";
+            errs() << MI.getOpcode() << ":";
+            bool printed = false;
             for (unsigned i = 0; i < MI.getNumOperands(); ++i) { // for each operand in the instruction
                 MachineOperand &MO = MI.getOperand(i);
                 if(MO.isReg() && MO.getReg().id() != 0){
-                    if(MO.getReg().isVirtual()){
-                        errs() << MO.getReg().virtRegIndex() << " ";
+                    if (printed) {
+                        if(MO.getReg().isVirtual()){
+                            errs() << "," << MO.getReg().virtRegIndex();
+                        }
+                        else{
+                            errs() << "," << MO.getReg();
+                        }
                     }
-                    else{
-                        errs() << MO.getReg() << " ";
+                    else {
+                        if(MO.getReg().isVirtual()){
+                            errs() << MO.getReg().virtRegIndex();
+                        }
+                        else{
+                            errs() << MO.getReg();
+                        }
+                        printed = true;
                     }
                 }
             }
-            errs() << ", ";
+            errs() << " ";
         }
         errs() << "\n";
     }
 
     return false;
 }
+
+// bool PrintBeforeRegAlloc::runOnMachineFunction(MachineFunction &MF) {
+//     errs() << "Before \n --------------------------------------------- \n";
+//     for (auto &MBB : MF) {
+//         // errs() << "Analyzing Basic Block: " << MBB.getName() << "\n";
+//         for (auto &MI : MBB) { // for each instruction in the basic block
+//             // errs() << "  Instruction: " << MI << "\n";
+//             errs() << MI.getOpcode() << " ";
+//             for (unsigned i = 0; i < MI.getNumOperands(); ++i) { // for each operand in the instruction
+//                 MachineOperand &MO = MI.getOperand(i);
+//                 if(MO.isReg() && MO.getReg().id() != 0){
+//                     if(MO.getReg().isVirtual()){
+//                         errs() << MO.getReg().virtRegIndex() << " ";
+//                     }
+//                     else{
+//                         errs() << MO.getReg() << " ";
+//                     }
+//                 }
+//             }
+//             errs() << ", ";
+//         }
+//         errs() << "\n";
+//     }
+
+//     return false;
+// }
 
 } // end of anonymous namespace
 
