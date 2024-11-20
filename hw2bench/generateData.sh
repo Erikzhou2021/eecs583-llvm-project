@@ -1,9 +1,10 @@
 extractData() {
-    for file in *.c; do
+    # for file in *.c; do
+    for file in $(ls -1 . | grep \.c\$ | sort); do
     echo ${file}
     # compile to llvm IR
-    clang -emit-llvm -c ${file} -o temp.bc
-    # clang -emit-llvm -c ${file} -o temp.bc -O3
+    # clang -emit-llvm -c ${file} -o temp.bc
+    clang -emit-llvm -c ${file} -o temp.bc -O3
     # clang -c ${file} -o temp.bc
 
     # run the pass

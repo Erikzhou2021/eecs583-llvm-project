@@ -1,22 +1,24 @@
-def tokenize_inst(inst, only_reg=True):
-    tokens = [] if only_reg else [2000]
+import glob
+
+def tokenize_inst(inst, only_reg=True, include_tags=False):
+    tokens = [20000] if include_tags else []
     opcode, registers = inst.split(":")
-    opcode = int(opcode.split("|")[1])
+    opcode = int(opcode.split("|")[1]) + 1000
+    if opcode == 1000 + 19: return []
     if not only_reg: tokens.append(opcode)
     if registers != '':
         registers = registers.split(",")
         tokens += [int(r) for r in registers]
-    if not only_reg: tokens.append(2001)
-    if opcode == 19: return []
+    if include_tags: tokens.append(20001)
     return tokens
 
 
-def tokenize_bb(bb, only_reg=True):
-    tokens = [] if only_reg else [1000]
+def tokenize_bb(bb, only_reg=True, include_tags=False):
+    tokens = [10000] if include_tags else []
     instructions = bb.strip(" ").split(" ")
     for inst in instructions:
-        tokens += tokenize_inst(inst, only_reg=only_reg)
-    if not only_reg: tokens.append(1001)
+        tokens += tokenize_inst(inst, only_reg=only_reg, include_tags=include_tags)
+    if include_tags: tokens.append(10001)
     return tokens
 
 
@@ -40,7 +42,9 @@ def tokenized_format(input_file, state="post", only_reg=True):
         bb_tokens = []
         txt = f.read()
         pre, post = txt.split('~')
-        
+        # post = txt.split('~')
+        # p = post
+        # print(p)
         p = pre if state == "pre" else post
         basic_blocks = p.strip().split('\n')
         for bb in basic_blocks:
@@ -56,8 +60,22 @@ def print_tokens(bb_tokens):
                 print()
         print('\n')
 
-bb_tokens = tokenized_format("hw2correct1.c.txt")
-print(bb_tokens)
+
+file_paths = sorted(list(glob.glob("../hw2bench/*.txt")))
+with open("../hw2bench/labels.csv", "w") as f:
+    for path in file_paths:
+        bb_tokens = tokenized_format(path, only_reg=False)
+        
+        f.write(",".join([str(i) for i in bb_tokens]))
+        f.write('\n')
+    
+
+# bb_tokens = tokenized_format("../hw2bench/hw2correct1.c.txt", only_reg=True)
+# print(bb_tokens)
+# bb_tokens = tokenized_format("../hw2bench/hw2correct1.c.txt", only_reg=False)
+# print(bb_tokens)
+
+
 # bb_tokens = tokenized_format("spill.c.txt")
 # print_tokens(bb_tokens)
 # print(bb_tokens)
