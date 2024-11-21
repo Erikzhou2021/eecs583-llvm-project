@@ -8,34 +8,27 @@ op codes: 4000+
 """
 import glob
 
-def tokenize_inst(inst, only_reg=True):
-    tokens = [] if only_reg else [] # might not need a special token for this idk
+def tokenize_inst(inst, only_reg=True, include_tags=False):
+    tokens = []
     opcode, registers = inst.split(":")
     opcode = int(opcode.split("|")[1])
+    if opcode == 19: return []
     opcode += 4000
-    # if include_tags: tokens.append(20001)
+    if not only_reg: tokens.append(opcode)
+    if registers != '':
+        registers = registers.split(",")
+        tokens += [int(r) for r in registers]
     return tokens
 
-# def tokenize_inst(inst, only_reg=True, include_tags=False):
-#     tokens = [20000] if include_tags else []
-#     opcode, registers = inst.split(":")
-#     opcode = int(opcode.split("|")[1]) + 1000
-#     if opcode == 1000 + 19: return []
-#     if not only_reg: tokens.append(opcode)
-#     if registers != '':
-#         registers = registers.split(",")
-#         tokens += [int(r) for r in registers]
-    # if include_tags: tokens.append(20001)
-    # return tokens
-    
-
-
-def tokenize_bb(bb, only_reg=True, include_tags=False):
-    tokens = [10000] if include_tags else []
+def tokenize_bb(bb, only_reg=True, include_tags=True):
+    tokens = [3000] if include_tags else []
+    if include_tags:
+        block_number, bb = bb.strip(" ").split("$")
+        tokens.append(int(block_number))
     instructions = bb.strip(" ").split(" ")
     for inst in instructions:
         tokens += tokenize_inst(inst, only_reg=only_reg, include_tags=include_tags)
-    if include_tags: tokens.append(10001)
+    if include_tags: tokens.append(3001)
     return tokens
 
 
@@ -81,7 +74,7 @@ def print_tokens(bb_tokens):
 file_paths = sorted(list(glob.glob("../hw2bench/*.txt")))
 with open("../hw2bench/labels.csv", "w") as f:
     for path in file_paths:
-        bb_tokens = tokenized_format(path, only_reg=False)
+        bb_tokens = tokenized_format(path, state="post", only_reg=False)
         
         f.write(",".join([str(i) for i in bb_tokens]))
         f.write('\n')
