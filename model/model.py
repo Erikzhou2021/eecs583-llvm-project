@@ -7,32 +7,54 @@ from torch.utils.data import Dataset, DataLoader
 import csv
 from itertools import repeat
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# NUM_PHYS_REG = 1000
+NUM_TOKENS = 25000
+
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model, max_seq_length):
+        super(PositionalEncoding, self).__init__()
+        
+        pe = torch.zeros(max_seq_length, d_model)
+        position = torch.arange(0, max_seq_length, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model))
+        
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        
+        self.register_buffer('pe', pe.unsqueeze(0))
+        
+    def forward(self, x):
+        return x + self.pe[:, :x.size(1)]
+
 class TransformerModel(nn.Module):
-    def __init__(self, output_dim=1000, d_model=100, nhead=8, num_encoder_layers=6, num_decoder_layers=6, dim_feedforward=2048, dropout=0.1, max_len=100):
+    def __init__(self, output_dim=NUM_TOKENS, d_model=512, max_len=1000):
         super(TransformerModel, self).__init__()
 
         # Embedding layers
-        # self.src_embedding = nn.Embedding(input_dim, d_model)
-        # self.tgt_embedding = nn.Embedding(output_dim, d_model)
+        self.src_embedding = nn.Embedding(NUM_TOKENS, d_model) # Just going to pretend we have 25000 different tokens, hopefully this works
+        self.tgt_embedding = nn.Embedding(NUM_TOKENS, d_model)
 
         # Positional encoding
-        # self.positional_encoding = PositionalEncoding(d_model, dropout, max_len)
+        self.positional_encoding = PositionalEncoding(d_model, max_len)
 
         # Transformer model
-        self.transformer = nn.Transformer(d_model, 10, num_encoder_layers, num_decoder_layers, dim_feedforward, dropout, batch_first=True)
+        self.transformer = nn.Transformer(d_model, nhead=8, num_encoder_layers=6, num_decoder_layers=6, dim_feedforward=2048, dropout=0.1, batch_first=True)
 
         # Output layer
-        self.fc_out = nn.Linear(d_model, output_dim)
+        self.fc_out = nn.Linear(d_model, NUM_TOKENS)
         self.d_model = d_model
 
     def forward(self, src, tgt):
         # Embed and apply positional encoding to source and target
         
         # src = self.src_embedding(src) * math.sqrt(self.d_model)
-        # src = self.positional_encoding(src)
+        src = self.src_embedding(src)
+        src = self.positional_encoding(src)
 
         # tgt = self.tgt_embedding(tgt) * math.sqrt(self.d_model)
-        # tgt = self.positional_encoding(tgt)
+        tgt = self.tgt_embedding(tgt)
+        tgt = self.positional_encoding(tgt)
 
         # Pass through the transformer
         # src: our custom tokenized input
@@ -54,16 +76,16 @@ class TransformerModel(nn.Module):
         output = self.fc_out(memory)
         return output
 
-def train_loop(model, opt, loss_fn, dataloader, device=torch.device('cuda:0')): 
+def train_loop(model, opt, loss_fn, dataloader): 
     model.train()
     total_loss = 0
     
     for batch in dataloader:
+        opt.zero_grad()
         X, y = batch
-        print(y)
         # X, y = batch[:, 0], batch[:, 1]
         X, y = [X], [y]
-        X, y = torch.tensor(X).to(device), torch.tensor(y).to(device)
+        X, y = torch.tensor(X, dtype=torch.int32).to(device), torch.tensor(y, dtype=torch.int32).to(device)
 
         # Now we shift the tgt by one so with the <SOS> we predict the token at pos 1
         y_input = y[:, :-1]
@@ -77,10 +99,14 @@ def train_loop(model, opt, loss_fn, dataloader, device=torch.device('cuda:0')):
         pred = model(X, y_input)
 
         # Permute pred to have batch size first again
-        pred = pred.permute(1, 2, 0)      
+        # pred = pred.permute(1, 2, 0) 
+        pred = pred.contiguous().view(-1, NUM_TOKENS)
+        y_expected = y_expected.contiguous().view(-1)
+        y_expected = y_expected.type(torch.LongTensor)
+        # print(pred.shape, pred.dtype)  
+        # print(y_expected.shape, y_expected.dtype)  
         loss = loss_fn(pred, y_expected)
 
-        opt.zero_grad()
         loss.backward()
         opt.step()
     
@@ -88,7 +114,7 @@ def train_loop(model, opt, loss_fn, dataloader, device=torch.device('cuda:0')):
         
     return total_loss / len(dataloader)
 
-def validation_loop(model, loss_fn, dataloader, device=torch.device('cuda:0')):
+def validation_loop(model, loss_fn, dataloader):
     model.eval()
     total_loss = 0
     
@@ -96,7 +122,7 @@ def validation_loop(model, loss_fn, dataloader, device=torch.device('cuda:0')):
         for batch in dataloader:
             X, y = batch
             # X, y = batch[:, 0], batch[:, 1]
-            X, y = torch.tensor(X, dtype=torch.long, device=device), torch.tensor(y, dtype=torch.long, device=device)
+            X, y = torch.tensor(X, dtype=torch.int32, device=device), torch.tensor(y, dtype=torch.int32, device=device)
 
             # Now we shift the tgt by one so with the <SOS> we predict the token at pos 1
             y_input = y[:, :-1]
@@ -110,7 +136,11 @@ def validation_loop(model, loss_fn, dataloader, device=torch.device('cuda:0')):
             pred = model(X, y_input)
 
             # Permute pred to have batch size first again
-            pred = pred.permute(1, 2, 0)      
+            # pred = pred.permute(1, 2, 0)  
+            pred = pred.contiguous().view(-1, NUM_TOKENS)
+            y_expected = y_expected.contiguous().view(-1)
+            y_expected = y_expected.type(torch.LongTensor) 
+
             loss = loss_fn(pred, y_expected)
             total_loss += loss.detach().item()
         
@@ -145,15 +175,19 @@ class RegisterAllocationDataset(Dataset):
         # self.inputs = pd.read_csv("vectorized.csv", header=None)
         # self.labels = pd.read_csv("labels.csv", header=None)
         self.batch_size = 4
-        with open("vectorized.csv", mode="r") as file:
+        # with open("vectorized.csv", mode="r") as file:
+        #     reader = csv.reader(file)
+        #     self.inputs = [list(map(float, row)) for row in reader]
+        with open("input.csv", mode="r") as file:
             reader = csv.reader(file)
             self.inputs = [list(map(float, row)) for row in reader]
-        
+
         with open("labels.csv", mode="r") as file:
             reader = csv.reader(file)
             self.labels = [list(map(float, row)) for row in reader]
         
-        self.data = [[inp, [[l] + [0] * 99 for l in label]] for inp, label in zip(self.inputs, self.labels)]
+        self.data = [[inp, label] for inp, label in zip(self.inputs, self.labels)]
+        # self.data = [[inp, [[l] + [0] * 99 for l in label]] for inp, label in zip(self.inputs, self.labels)]
 
     def __len__(self):
         return len(self.data)
@@ -178,10 +212,10 @@ class RegisterAllocationDataset(Dataset):
 
 if __name__ == "__main__":
     model = TransformerModel()
-    model = model.to(torch.device("cuda"))
+    model = model.to(device)
     trainLoader = RegisterAllocationDataset()
     valLoader = RegisterAllocationDataset()
     loss = torch.nn.CrossEntropyLoss()
     optim = torch.optim.Adam(params=model.parameters(), lr=1e-3)
 
-    train(model, optim, loss, trainLoader, valLoader, epochs=1)
+    train(model, optim, loss, trainLoader, valLoader, epochs=20)

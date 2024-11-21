@@ -72,9 +72,9 @@ def print_tokens(bb_tokens):
 
 
 file_paths = sorted(list(glob.glob("../hw2bench/*.txt")))
-with open("../hw2bench/labels.csv", "w") as f:
+with open("../hw2bench/input.csv", "w") as f:
     for path in file_paths:
-        bb_tokens = tokenized_format(path, state="post", only_reg=False)
+        bb_tokens = tokenized_format(path, state="pre", only_reg=False)
         
         f.write(",".join([str(i) for i in bb_tokens]))
         f.write('\n')
