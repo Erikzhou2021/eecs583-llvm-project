@@ -25,7 +25,7 @@ void rot(int c, char *str)
 	{
 		if( 0 == isalpha(str[i]) )  continue; /* not alphabet character */
 
-                idx = (int) (tolower(str[i]) - 'a') + c) % 26; /* compute index */
+                idx = ((int) (tolower(str[i]) - 'a') + c) % 26; /* compute index */
 
 		if( isupper(str[i]) )
                     subst = alpha_high[idx];
