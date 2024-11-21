@@ -31,35 +31,49 @@ public:
 char PrintBeforeRegAlloc::ID = 0;
 
 bool PrintBeforeRegAlloc::runOnMachineFunction(MachineFunction &MF) {
-    // errs() << "Before \n --------------------------------------------- \n";
-    // for (auto &MBB : MF) {
-    //     // errs() << "Analyzing Basic Block: " << MBB.getName() << "\n";
-    //     for (auto &MI : MBB) { // for each instruction in the basic block
-    //         // errs() << "  Instruction: " << MI << "\n";
-    //         errs() << MI.getOpcode() << " ";
-    //         for (unsigned i = 0; i < MI.getNumOperands(); ++i) { // for each operand in the instruction
-    //             MachineOperand &MO = MI.getOperand(i);
-    //             if(MO.isReg() && MO.getReg().id() != 0){
-    //                 if(MO.getReg().isVirtual()){
-    //                     errs() << MO.getReg().virtRegIndex() << " ";
-    //                 }
-    //                 else{
-    //                     errs() << MO.getReg() << " ";
-    //                 }
-    //             }
-    //         }
-    //         errs() << ", ";
-    //     }
-    //     errs() << "\n";
-    // }
+    const llvm::TargetInstrInfo *TII = MF.getSubtarget().getInstrInfo();
+    for (auto &MBB : MF) {
+        errs() << MBB.getNumber() + 3002 << "$";
+        for (auto &MI : MBB) { // for each instruction in the basic block
+            // errs() << "  Instruction: " << MI << "\n";
+            errs() << TII->getName(MI.getOpcode()) << "|";
+            errs() << MI.getOpcode() << ":";
+            bool printed = false;
+            for (unsigned i = 0; i < MI.getNumOperands(); ++i) { // for each operand in the instruction
+                MachineOperand &MO = MI.getOperand(i);
+                if(MI.isBranch() && MO.isMBB()){
+                    if(printed){
+                        errs() << ",";
+                    }
+                    errs() << MO.getMBB()->getNumber() + 3002;
+                    printed = true;
+                }
+                if(MO.isReg() && MO.getReg().id() != 0){
+                    if(printed){
+                        errs() << ",";
+                    }
+                    if(MO.getReg().isVirtual()){
+                        errs() << MO.getReg().virtRegIndex() + 1000;
+                    }
+                    else{
+                        errs() << MO.getReg();
+                    }
+                    printed = true;
+                }
+            }
+            errs() << " ";
+        }
+        errs() << "\n";
+    }
+
     // const TargetInstrInfo *TII = MF.getSubtarget().getInstrInfo();
     // for (auto &MBB : MF) {
     //     for (auto &MI : MBB) {
     //         errs() << TII->getName(MI.getOpcode()) << "\n";
     //     }
     // }
-    MIR2Vec_Symbolic* symbolic = new MIR2Vec_Symbolic("/home/erzh/llvm-project/llvm/lib/Target/X86/vocabulary/seedEmbedding_5500E_100D.txt");
-    symbolic->generateSymbolicEncodings(MF);
+    // MIR2Vec_Symbolic* symbolic = new MIR2Vec_Symbolic("/home/erzh/llvm-project/llvm/lib/Target/X86/vocabulary/seedEmbedding_5500E_100D.txt");
+    // symbolic->generateSymbolicEncodings(MF);
     // auto instVecMap = symbolic->getInstVecMap();
 
     return false;

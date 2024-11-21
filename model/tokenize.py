@@ -1,22 +1,33 @@
+"""
+Tokenization scheme:
+physical registers: 0 - 1000
+virtual registers: 1000 - 2000
+basic block start / end 3000, 3001
+basic block numbers: 3002 - 4000
+op codes: 4000+
+"""
+
+
 def tokenize_inst(inst, only_reg=True):
-    tokens = [] if only_reg else [2000]
+    tokens = [] if only_reg else [] # might not need a special token for this idk
     opcode, registers = inst.split(":")
     opcode = int(opcode.split("|")[1])
+    opcode += 4000
     if not only_reg: tokens.append(opcode)
     if registers != '':
         registers = registers.split(",")
         tokens += [int(r) for r in registers]
-    if not only_reg: tokens.append(2001)
-    if opcode == 19: return []
+    # if not only_reg: tokens.append(-1)
+    if opcode == 4019: return []
     return tokens
 
 
 def tokenize_bb(bb, only_reg=True):
-    tokens = [] if only_reg else [1000]
+    tokens = [] if only_reg else [3000]
     instructions = bb.strip(" ").split(" ")
     for inst in instructions:
         tokens += tokenize_inst(inst, only_reg=only_reg)
-    if not only_reg: tokens.append(1001)
+    if not only_reg: tokens.append(3001)
     return tokens
 
 
