@@ -8,6 +8,7 @@ from torch.nn.utils.rnn import pad_sequence
 import csv
 from itertools import repeat
 import time
+from sklearn.metrics import accuracy_score
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # device = torch.device("cpu")
@@ -145,7 +146,8 @@ def train_loop(model, opt, loss_fn, dataloader, scaler):
 
 def validation_loop(model, loss_fn, dataloader):
     model.eval()
-    total_loss = 0
+    # total_loss = 0
+    total_acc = 0
     
     with torch.no_grad():
         for batch in dataloader:
@@ -155,26 +157,38 @@ def validation_loop(model, loss_fn, dataloader):
 
             # Now we shift the tgt by one so with the <SOS> we predict the token at pos 1
             y_input = y[:, :-1]
-            y_expected = y[:, 1:]
+            # y_expected = y[:, 1:]
             
             # Get mask to mask out the next words
-            sequence_length = len(y_input)
+            # sequence_length = len(y_input)
             # tgt_mask = model.get_tgt_mask(sequence_length).to(device)
 
             # Standard training except we pass in y_input and src_mask
-            pred = model(X, y_input)
+            # pred = model(X, y_input)
+            pred = []
+            for row in X:
+                pred.append(inference(model, row))
 
             # Permute pred to have batch size first again
-            pred = pred.permute(1, 2, 0)  
-            pred = pred.contiguous().view(-1, NUM_TOKENS)
-            y_expected = y_expected.contiguous().view(-1)
-            y_expected = y_expected.type(torch.LongTensor) 
+            # pred = pred.permute(1, 2, 0)  
+            # pred = pred.contiguous().view(-1, NUM_TOKENS)
+            # y_expected = y_expected.contiguous().view(-1)
+            # y_expected = y_expected.type(torch.LongTensor) 
 
-            loss = loss_fn(pred, y_expected.to(device))
+            y_expected = []
+            for row in y:
+                temp = []
+                for val in row:
+                    if val < 1000:
+                        temp.append(val)
+                y_expected.append(temp)
+
+            total_acc += calcAccuracy(pred, y_expected)
             # loss = loss_fn(pred, y_expected.to(device))
-            total_loss += loss.detach().item()
+            # # loss = loss_fn(pred, y_expected.to(device))
+            # total_loss += loss.detach().item()
         
-    return total_loss / len(dataloader)
+    return total_acc / len(dataloader)
 
 def train(model, opt, loss_fn, train_dataloader, val_dataloader, scaler, epochs):
     # Used for plotting later on
@@ -198,9 +212,28 @@ def train(model, opt, loss_fn, train_dataloader, val_dataloader, scaler, epochs)
         
     return train_loss_list, validation_loss_list
 
-# # Prepare a dataset
-# basic_blocks = [bb1, bb2, bb3]  # List of BasicBlock objects
-# dataset = RegisterAllocationDataset(basic_blocks, tokenizer)
+def inference(model, X):
+    y = []
+    y_pred = []
+    i = 0
+    while i < len(X) - 1:
+        if X[i] >= 3000:
+            y.append(X[i])
+        if len(y) > 1000:
+            break
+        pred = model(torch.unsqueeze(X, 0), torch.tensor([y]))
+        predToken = torch.argmax(pred[-1]).item()
+        if i == len(X)-1 or (i < len(X)-2 and X[i+1] < 3000):
+            y.append(predToken)
+            y_pred.append(predToken)
+    return y
+
+def calcAccuracy(y, y_expected):
+    count = 0
+    for i in range(len(y_expected)):
+        if y[i] == y_expected:
+            count += 1
+    return count / len(y_expected)
 
 def collate_fn(batch):
     sequences, labels = zip(*batch)  # Unpack inputs and labels
@@ -267,16 +300,36 @@ class RegisterAllocationDataset(Dataset):
         # }
         return self.data[idx], self.labels[idx]
 
+class ValDataset(Dataset):
+    def __init__(self):
+        with open("input.csv", mode="r") as file:
+            reader = csv.reader(file)
+            self.data = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
+            self.data = self.data
+
+        with open("labels.csv", mode="r") as file:
+            reader = csv.reader(file)
+            self.labels = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
+            self.labels = self.labels
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx], self.labels[idx]
+
 if __name__ == "__main__":
     torch.cuda.empty_cache()
     model = TransformerModel().to(device)
     torch.backends.cudnn.benchmark = True
     trainData = RegisterAllocationDataset()
-    valLoader = RegisterAllocationDataset()
+    valData = ValDataset()
     loss = torch.nn.CrossEntropyLoss(ignore_index=-1)
     optim = torch.optim.Adam(params=model.parameters(), lr=1e-3)
     # print(sum(p.numel() for p in model.parameters()))
     # exit(0)
     trainLoader = DataLoader(trainData, batch_size=8, shuffle=True, collate_fn=collate_fn, pin_memory=True)
+    valLoader = DataLoader(valData, batch_size=1, collate_fn=collate_fn, pin_memory=True)
     scaler = torch.amp.GradScaler()
-    train(model, optim, loss, trainLoader, trainLoader, scaler, epochs=5)
+    print(validation_loop(model, None, valLoader))
+    # train(model, optim, loss, trainLoader, trainLoader, scaler, epochs=5)
