@@ -2,8 +2,7 @@
 Tokenization scheme:
 physical registers: 0 - 1000
 virtual registers: 1000 - 2000
-basic block start / end 3000, 3001
-basic block numbers: 3002 - 4000
+basic block numbers: 3000 - 4000
 op codes: 4000+
 """
 import glob
@@ -23,14 +22,13 @@ def tokenize_inst(inst, only_reg=True, include_tags=False):
     return tokens
 
 def tokenize_bb(bb, only_reg=True, include_tags=True):
-    tokens = [3000] if include_tags else []
+    tokens = []
     if include_tags:
         block_number, bb = bb.strip(" ").split("$")
         tokens.append(int(block_number))
     instructions = bb.strip(" ").split(" ")
     for inst in instructions:
         tokens += tokenize_inst(inst, only_reg=only_reg, include_tags=include_tags)
-    if include_tags: tokens.append(3001)
     return tokens
 
 

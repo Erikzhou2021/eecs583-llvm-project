@@ -32,7 +32,7 @@ bool PrintAfterRegAlloc::runOnMachineFunction(MachineFunction &MF) {
     errs() << "~\n";
     const llvm::TargetInstrInfo *TII = MF.getSubtarget().getInstrInfo();
     for (auto &MBB : MF) {
-        errs() << MBB.getNumber() + 3002 << "$";
+        errs() << MBB.getNumber() + 3000 << "$";
         for (auto &MI : MBB) { // for each instruction in the basic block
             // errs() << "  Instruction: " << MI << "\n";
             errs() << TII->getName(MI.getOpcode()) << "|";
@@ -44,7 +44,7 @@ bool PrintAfterRegAlloc::runOnMachineFunction(MachineFunction &MF) {
                     if(printed){
                         errs() << ",";
                     }
-                    errs() << MO.getMBB()->getNumber() + 3002;
+                    errs() << MO.getMBB()->getNumber() + 3000;
                     printed = true;
                 }
                 if (MO.isReg() && MO.getReg().id() != 0){
