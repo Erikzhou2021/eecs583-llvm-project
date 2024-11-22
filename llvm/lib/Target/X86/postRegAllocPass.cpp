@@ -61,7 +61,7 @@ bool PrintAfterRegAlloc::runOnMachineFunction(MachineFunction &MF) {
         }
         errs() << "\n";
     }
-
+    errs() << "&\n";
     return false;
 }
 

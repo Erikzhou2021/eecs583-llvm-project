@@ -14,6 +14,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # NUM_PHYS_REG = 1000
 NUM_TOKENS = 25000
 # NUM_TOKENS = 1000
+MAX_INPUT_LEN = 1000
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, max_seq_length):
@@ -32,7 +33,7 @@ class PositionalEncoding(nn.Module):
         return x + self.pe[:, :x.size(1)]
 
 class TransformerModel(nn.Module):
-    def __init__(self, output_dim=NUM_TOKENS, d_model=512, max_len=1000):
+    def __init__(self, output_dim=NUM_TOKENS, d_model=512, max_len=MAX_INPUT_LEN):
         super(TransformerModel, self).__init__()
 
         # Embedding layers
@@ -190,6 +191,8 @@ def train(model, opt, loss_fn, train_dataloader, val_dataloader, epochs):
 
 def collate_fn(batch):
     sequences, labels = zip(*batch)  # Unpack inputs and labels
+    sequences = [sequence[:MAX_INPUT_LEN] for sequence in sequences]
+    labels = [label[:MAX_INPUT_LEN] for label in labels]
     padded_sequences = pad_sequence(sequences, batch_first=True, padding_value=0)
     padded_labels = pad_sequence(labels, batch_first=True, padding_value=-1)  # Use a different padding value for labels
     return padded_sequences, padded_labels
@@ -204,12 +207,12 @@ class RegisterAllocationDataset(Dataset):
         #     reader = csv.reader(file)
         #     self.inputs = [list(map(float, row)) for row in reader]
         const = 100
-        with open("input.csv", mode="r") as file:
+        with open("allDataInput.csv", mode="r") as file:
             reader = csv.reader(file)
             self.data = [torch.tensor(list(map(float, row))) for row in reader]
             self.data = self.data * const
 
-        with open("labels.csv", mode="r") as file:
+        with open("allDataLabels.csv", mode="r") as file:
             reader = csv.reader(file)
             self.labels = [torch.tensor(list(map(float, row))) for row in reader]
             self.labels = self.labels * const

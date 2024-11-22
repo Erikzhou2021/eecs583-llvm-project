@@ -10,6 +10,8 @@ import glob
 
 def tokenize_inst(inst, only_reg=True, include_tags=False):
     tokens = []
+    if inst == "":
+        return tokens
     opcode, registers = inst.split(":")
     opcode = int(opcode.split("|")[1])
     if opcode == 19: return []
@@ -49,17 +51,25 @@ def tokenized_format(input_file, state="post", only_reg=True):
     Output: a list of lists, where each inner list is a basic block
     """
     with open(input_file, "r") as f:
-        bb_tokens = []
-        txt = f.read()
-        pre, post = txt.split('~')
-        # post = txt.split('~')
-        # p = post
-        # print(p)
-        p = pre if state == "pre" else post
-        basic_blocks = p.strip().split('\n')
-        for bb in basic_blocks:
-            bb_tokens += tokenize_bb(bb, only_reg=only_reg)
-    return bb_tokens
+        allTokens = []
+        allText = f.read()
+        passes = allText.split('&')
+
+        for txt in passes:
+            txt = txt.strip()
+            if txt == "":
+                continue
+            bb_tokens = []
+            pre, post = txt.split('~')
+            # post = txt.split('~')
+            # p = post
+            # print(p)
+            p = pre if state == "pre" else post
+            basic_blocks = p.strip().split('\n')
+            for bb in basic_blocks:
+                bb_tokens += tokenize_bb(bb, only_reg=only_reg)
+            allTokens.append(bb_tokens)
+    return allTokens
         
 
 def print_tokens(bb_tokens):
@@ -71,13 +81,22 @@ def print_tokens(bb_tokens):
         print('\n')
 
 
-file_paths = sorted(list(glob.glob("../hw2bench/*.txt")))
-with open("../hw2bench/input.csv", "w") as f:
+file_paths = sorted(list(glob.glob("../dataset/*.txt")))
+with open("allDataInput.csv", "w") as f:
     for path in file_paths:
-        bb_tokens = tokenized_format(path, state="pre", only_reg=False)
+        tokens = tokenized_format(path, state="pre", only_reg=False)
         
-        f.write(",".join([str(i) for i in bb_tokens]))
-        f.write('\n')
+        for bb_tokens in tokens:
+            f.write(",".join([str(i) for i in bb_tokens]))
+            f.write('\n')
+
+with open("allDataLabels.csv", "w") as f:
+    for path in file_paths:
+        tokens = tokenized_format(path, state="post", only_reg=False)
+        
+        for bb_tokens in tokens:
+            f.write(",".join([str(i) for i in bb_tokens]))
+            f.write('\n')
     
 
 # bb_tokens = tokenized_format("../hw2bench/hw2correct1.c.txt", only_reg=True)
