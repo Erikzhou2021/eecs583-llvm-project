@@ -85,50 +85,62 @@ class TransformerModel(nn.Module):
         output = self.fc_out(memory)
         return output
 
-def train_loop(model, opt, loss_fn, dataloader): 
+def train_loop(model, opt, loss_fn, dataloader, scaler): 
     model.train()
     total_loss = 0
     
-    for batch in dataloader:
+    for i, batch in enumerate(dataloader):
+        print(f"\rbatch {i + 1}", end="")
         opt.zero_grad()
         X, y = batch
         # print(X.shape)
         # print(y.shape)
         # X, y = batch[:, 0], batch[:, 1]
         # X, y = [X], [y]
-        X, y = torch.tensor(X, dtype=torch.int32).to(device), torch.tensor(y, dtype=torch.int32).to(device)
-        # X, y = X.to(device), y.to(device)
-
-        # Now we shift the tgt by one so with the <SOS> we predict the token at pos 1
-        y_input = y[:, :-1]
-        y_input = y_input.masked_fill(y_input == -1, 0)
-        y_expected = y[:, 1:]
+        # X, y = torch.tensor(X, dtype=torch.int32).to(device), torch.tensor(y, dtype=torch.int32).to(device)
+        X, y = X.to(device, non_blocking=True), y.to(device, non_blocking=True)
         
-        # Get mask to mask out the next words
-        sequence_length = len(y_input)
-        # tgt_mask = model.get_tgt_mask(sequence_length).to(device)
+        # print(f"Memory allocated: {torch.cuda.memory_allocated() / 1e6:.2f} MB")
+        # print(f"Memory reserved: {torch.cuda.memory_reserved() / 1e6:.2f} MB")
 
-        # print(X.shape, y.shape)
-        # Standard training except we pass in y_input and tgt_mask
-        pred = model(X, y_input)
+        with torch.amp.autocast("cuda" if torch.cuda.is_available() else "cpu"):
+            # Now we shift the tgt by one so with the <SOS> we predict the token at pos 1
+            y_input = y[:, :-1]
+            y_input = y_input.masked_fill(y_input == -1, 0)
+            y_expected = y[:, 1:]
+            # print(y.device, y_input.device, y_expected.device)
+            # Get mask to mask out the next words
+            sequence_length = len(y_input)
+            # tgt_mask = model.get_tgt_mask(sequence_length).to(device)
 
-        # Permute pred to have batch size first again
-        # print(pred.shape)
-        # pred = pred.permute(1, 2, 0) 
-        
-        pred = pred.contiguous().view(-1, NUM_TOKENS)
-        y_expected = y_expected.contiguous().view(-1)
-        y_expected = y_expected.type(torch.LongTensor)
-        # print(pred.shape, pred.dtype)  
-        # print(y_expected.shape, y_expected.dtype)  
-        # print(pred.shape)
-        loss = loss_fn(pred, y_expected.to(device))
+            # print(X.shape, y.shape)
+            # Standard training except we pass in y_input and tgt_mask
+            pred = model(X, y_input)
 
-        loss.backward()
-        opt.step()
+            # Permute pred to have batch size first again
+            # print(pred.shape)
+            # pred = pred.permute(1, 2, 0) 
+            
+            # pred = pred.contiguous().view(-1, NUM_TOKENS)
+            # y_expected = y_expected.contiguous().view(-1)
+            pred = pred.reshape(-1, NUM_TOKENS)
+            y_expected = y_expected.reshape(-1)
+            y_expected = y_expected.type(torch.LongTensor)
+            
+            # print(pred.shape, pred.dtype)  
+            # print(y_expected.shape, y_expected.dtype)  
+            # print(pred.shape)
+            # loss = loss_fn(pred, y_expected)
+            loss = loss_fn(pred, y_expected.to(device))
+
+        scaler.scale(loss).backward()
+        scaler.step(opt)
+        scaler.update()
+        # loss.backward()
+        # opt.step()
     
         total_loss += loss.detach().item()
-        
+    print() 
     return total_loss / len(dataloader)
 
 def validation_loop(model, loss_fn, dataloader):
@@ -159,11 +171,12 @@ def validation_loop(model, loss_fn, dataloader):
             y_expected = y_expected.type(torch.LongTensor) 
 
             loss = loss_fn(pred, y_expected.to(device))
+            # loss = loss_fn(pred, y_expected.to(device))
             total_loss += loss.detach().item()
         
     return total_loss / len(dataloader)
 
-def train(model, opt, loss_fn, train_dataloader, val_dataloader, epochs):
+def train(model, opt, loss_fn, train_dataloader, val_dataloader, scaler, epochs):
     # Used for plotting later on
     train_loss_list, validation_loss_list = [], []
     
@@ -172,7 +185,7 @@ def train(model, opt, loss_fn, train_dataloader, val_dataloader, epochs):
         start = time.time()
         print("-"*25, f"Epoch {epoch + 1}","-"*25)
         
-        train_loss = train_loop(model, opt, loss_fn, train_dataloader)
+        train_loss = train_loop(model, opt, loss_fn, train_dataloader, scaler)
         train_loss_list += [train_loss]
         
         # validation_loss = validation_loop(model, loss_fn, val_dataloader)
@@ -191,31 +204,40 @@ def train(model, opt, loss_fn, train_dataloader, val_dataloader, epochs):
 
 def collate_fn(batch):
     sequences, labels = zip(*batch)  # Unpack inputs and labels
+    # print(type(batch))
+    # print(type(sequences), type(labels))
+    # print(type(sequences[0]))
     sequences = [sequence[:MAX_INPUT_LEN] for sequence in sequences]
     labels = [label[:MAX_INPUT_LEN] for label in labels]
     padded_sequences = pad_sequence(sequences, batch_first=True, padding_value=0)
     padded_labels = pad_sequence(labels, batch_first=True, padding_value=-1)  # Use a different padding value for labels
     return padded_sequences, padded_labels
 
+# def collate_fn(batch):
+#     sequences, labels = zip(*batch)
+#     sequences = [torch.tensor(sequence[:MAX_INPUT_LEN], dtype=torch.int32) for sequence in sequences]
+#     labels = [torch.tensor(label[:MAX_INPUT_LEN], dtype=torch.int32) for label in labels]
+#     padded_sequences = pad_sequence(sequences, batch_first=True, padding_value=0)
+#     padded_labels = pad_sequence(labels, batch_first=True, padding_value=-1)
+#     return padded_sequences, padded_labels
+
 
 class RegisterAllocationDataset(Dataset):
     def __init__(self):
         # self.inputs = pd.read_csv("vectorized.csv", header=None)
         # self.labels = pd.read_csv("labels.csv", header=None)
-        self.batch_size = 4
         # with open("vectorized.csv", mode="r") as file:
         #     reader = csv.reader(file)
         #     self.inputs = [list(map(float, row)) for row in reader]
-        const = 100
         with open("allDataInput.csv", mode="r") as file:
             reader = csv.reader(file)
-            self.data = [torch.tensor(list(map(float, row))) for row in reader]
-            self.data = self.data * const
+            self.data = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
+            self.data = self.data
 
         with open("allDataLabels.csv", mode="r") as file:
             reader = csv.reader(file)
-            self.labels = [torch.tensor(list(map(float, row))) for row in reader]
-            self.labels = self.labels * const
+            self.labels = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
+            self.labels = self.labels
         
         # for sequence in self.data:
         #     assert all(0 <= token < NUM_TOKENS for token in sequence), "Token index out of range!"
@@ -246,14 +268,15 @@ class RegisterAllocationDataset(Dataset):
         return self.data[idx], self.labels[idx]
 
 if __name__ == "__main__":
-    model = TransformerModel()
-    model = model.to(device)
+    torch.cuda.empty_cache()
+    model = TransformerModel().to(device)
+    torch.backends.cudnn.benchmark = True
     trainData = RegisterAllocationDataset()
     valLoader = RegisterAllocationDataset()
     loss = torch.nn.CrossEntropyLoss(ignore_index=-1)
     optim = torch.optim.Adam(params=model.parameters(), lr=1e-3)
     # print(sum(p.numel() for p in model.parameters()))
     # exit(0)
-    trainLoader = DataLoader(trainData, batch_size=16, shuffle=True, collate_fn=collate_fn)
-
-    train(model, optim, loss, trainLoader, trainLoader, epochs=5)
+    trainLoader = DataLoader(trainData, batch_size=8, shuffle=True, collate_fn=collate_fn, pin_memory=True)
+    scaler = torch.amp.GradScaler()
+    train(model, optim, loss, trainLoader, trainLoader, scaler, epochs=5)
