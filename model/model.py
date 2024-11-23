@@ -11,6 +11,7 @@ import time
 from sklearn.metrics import accuracy_score
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
 # device = torch.device("cpu")
 # NUM_PHYS_REG = 1000
 NUM_TOKENS = 25000
@@ -51,7 +52,7 @@ class TransformerModel(nn.Module):
         self.fc_out = nn.Linear(d_model, NUM_TOKENS)
         self.d_model = d_model
 
-    def forward(self, src, tgt):
+    def forward(self, src, tgt, tgt_mask=None, src_pad_mask=None, tgt_pad_mask=None):
         # Embed and apply positional encoding to source and target
         
         # src = self.src_embedding(src) * math.sqrt(self.d_model)
@@ -80,11 +81,34 @@ class TransformerModel(nn.Module):
 
         
         # inference -> add, _predictedOut_, _predictedOut2_, _predictedOut3, xor, _predictedOut4_, _predictedOut5_, predictedOut6_
-        memory = self.transformer(src, tgt)
+        memory = self.transformer(src, tgt, tgt_mask=tgt_mask, src_key_padding_mask=src_pad_mask, tgt_key_padding_mask=tgt_pad_mask)
+        # memory = self.transformer(src, tgt)
 
         # Output layer
         output = self.fc_out(memory)
         return output
+
+    def get_tgt_mask(self, size) -> torch.tensor:
+        # Generates a squeare matrix where the each row allows one word more to be seen
+        mask = torch.tril(torch.ones(size, size) == 1) # Lower triangular matrix
+        mask = mask.float()
+        mask = mask.masked_fill(mask == 0, float('-inf')) # Convert zeros to -inf
+        mask = mask.masked_fill(mask == 1, float(0.0)) # Convert ones to 0
+        
+        # EX for size=5:
+        # [[0., -inf, -inf, -inf, -inf],
+        #  [0.,   0., -inf, -inf, -inf],
+        #  [0.,   0.,   0., -inf, -inf],
+        #  [0.,   0.,   0.,   0., -inf],
+        #  [0.,   0.,   0.,   0.,   0.]]
+        
+        return mask
+
+    def create_pad_mask(self, matrix: torch.tensor, pad_token: int) -> torch.tensor:
+        # If matrix = [1,2,3,0,0,0] where pad_token=0, the result mask is
+        # [False, False, False, True, True, True]
+        return (matrix == pad_token)
+
 
 def train_loop(model, opt, loss_fn, dataloader, scaler): 
     model.train()
@@ -111,12 +135,16 @@ def train_loop(model, opt, loss_fn, dataloader, scaler):
             y_expected = y[:, 1:]
             # print(y.device, y_input.device, y_expected.device)
             # Get mask to mask out the next words
-            sequence_length = len(y_input)
-            # tgt_mask = model.get_tgt_mask(sequence_length).to(device)
+            sequence_length = y_input.size(1)
+            tgt_mask = model.get_tgt_mask(sequence_length).to(device)
+            src_pad_mask = model.create_pad_mask(X, 0).to(device)
+            tgt_pad_mask = model.create_pad_mask(y_input, 0).to(device)
 
             # print(X.shape, y.shape)
             # Standard training except we pass in y_input and tgt_mask
-            pred = model(X, y_input)
+            # pred = model(X, y_input, tgt_mask)
+            # pred = model(X, y_input)
+            pred = model(X, y_input, tgt_mask=tgt_mask, src_pad_mask=src_pad_mask, tgt_pad_mask=tgt_pad_mask)
 
             # Permute pred to have batch size first again
             # print(pred.shape)
@@ -265,12 +293,12 @@ class RegisterAllocationDataset(Dataset):
         with open("allDataInput.csv", mode="r") as file:
             reader = csv.reader(file)
             self.data = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
-            self.data = self.data
+            # self.data = self.data[:1024]
 
         with open("allDataLabels.csv", mode="r") as file:
             reader = csv.reader(file)
             self.labels = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
-            self.labels = self.labels
+            # self.labels = self.labels[:1024]
         
         # for sequence in self.data:
         #     assert all(0 <= token < NUM_TOKENS for token in sequence), "Token index out of range!"
@@ -321,15 +349,17 @@ class ValDataset(Dataset):
 if __name__ == "__main__":
     torch.cuda.empty_cache()
     model = TransformerModel().to(device)
+    # model.load_state_dict(torch.load("weights_1024.pt", weights_only=True))
     torch.backends.cudnn.benchmark = True
     trainData = RegisterAllocationDataset()
     valData = ValDataset()
     loss = torch.nn.CrossEntropyLoss(ignore_index=-1)
-    optim = torch.optim.Adam(params=model.parameters(), lr=1e-3)
+    optim = torch.optim.Adam(params=model.parameters(), lr=2e-4)
     # print(sum(p.numel() for p in model.parameters()))
     # exit(0)
     trainLoader = DataLoader(trainData, batch_size=8, shuffle=True, collate_fn=collate_fn, pin_memory=True)
     valLoader = DataLoader(valData, batch_size=1, collate_fn=collate_fn, pin_memory=True)
     scaler = torch.amp.GradScaler()
     print(validation_loop(model, None, valLoader))
-    # train(model, optim, loss, trainLoader, trainLoader, scaler, epochs=5)
+    # train(model, optim, loss, trainLoader, trainLoader, scaler, epochs=10)
+    torch.save(model.state_dict(), "weights.pt")
