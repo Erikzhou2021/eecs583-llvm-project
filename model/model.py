@@ -394,12 +394,12 @@ class RegisterAllocationDataset(Dataset):
         with open("allDataInput.csv", mode="r") as file:
             reader = csv.reader(file)
             self.data = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
-            # self.data = self.data[:128]
+            self.data = self.data[:128]
 
         with open("allDataLabels.csv", mode="r") as file:
             reader = csv.reader(file)
             self.labels = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
-            # self.labels = self.labels[:128]
+            self.labels = self.labels[:128]
         
         # for sequence in self.data:
         #     assert all(0 <= token < NUM_TOKENS for token in sequence), "Token index out of range!"
@@ -450,7 +450,7 @@ class ValDataset(Dataset):
 
 if __name__ == "__main__":
     batch_size = 8
-    epochs = -1
+    epochs = 5
 
     torch.cuda.empty_cache()
     torch.backends.cudnn.benchmark = True
@@ -466,8 +466,8 @@ if __name__ == "__main__":
     train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, collate_fn=collate_fn, pin_memory=True)
-    valData = ValDataset()
-    valLoader = DataLoader(valData, batch_size=1, collate_fn=collate_fn)
+    # valData = ValDataset()
+    test_loader = DataLoader(val_dataset, batch_size=1, collate_fn=collate_fn)
     
     loss = torch.nn.CrossEntropyLoss(ignore_index=-1)
     optim = torch.optim.AdamW(params=model.parameters(), lr=2e-4, weight_decay=1e-3)
@@ -489,4 +489,4 @@ if __name__ == "__main__":
     # torch.save(model.state_dict(), "weights.pt")
     
     # model.load_state_dict(torch.load("weights_8k.pt", weights_only=True))
-    print(testing(model, None, valLoader))
+    print(testing(model, None, test_loader))
