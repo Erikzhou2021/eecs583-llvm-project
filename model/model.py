@@ -317,12 +317,12 @@ class RegisterAllocationDataset(Dataset):
         with open("allDataInput.csv", mode="r") as file:
             reader = csv.reader(file)
             self.data = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
-            self.data = self.data[:1024]
+            self.data = self.data[:6524]
 
         with open("allDataLabels.csv", mode="r") as file:
             reader = csv.reader(file)
             self.labels = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
-            self.labels = self.labels[:1024]
+            self.labels = self.labels[:6524]
         
         # for sequence in self.data:
         #     assert all(0 <= token < NUM_TOKENS for token in sequence), "Token index out of range!"
@@ -354,16 +354,16 @@ class RegisterAllocationDataset(Dataset):
 
 class ValDataset(Dataset):
     def __init__(self):
-        with open("input.csv", mode="r") as file:
+        with open("allDataInput.csv", mode="r") as file:
             reader = csv.reader(file)
             self.data = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
             # print("self.data", type(self.data), type(self.data[0]), type(self.data[0][0]))
-            self.data = self.data
+            self.data = self.data[6524:]
 
-        with open("labels.csv", mode="r") as file:
+        with open("allDataLabels.csv", mode="r") as file:
             reader = csv.reader(file)
             self.labels = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
-            self.labels = self.labels
+            self.labels = self.labels[6524:]
 
     def __len__(self):
         return len(self.data)
@@ -377,6 +377,7 @@ if __name__ == "__main__":
     # model.load_state_dict(torch.load("weights_8k.pt", weights_only=True))
     torch.backends.cudnn.benchmark = True
     trainData = RegisterAllocationDataset()
+    print(len(trainData))
     valData = ValDataset()
     loss = torch.nn.CrossEntropyLoss(ignore_index=-1)
     optim = torch.optim.Adam(params=model.parameters(), lr=1e-4)

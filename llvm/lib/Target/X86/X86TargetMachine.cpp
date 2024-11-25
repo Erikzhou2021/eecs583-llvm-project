@@ -556,7 +556,6 @@ void X86PassConfig::addPostRegAlloc() {
   // analyses needed by the LVIHardening pass when compiling at -O0.
   if (getOptLevel() != CodeGenOptLevel::None)
     addPass(createX86LoadValueInjectionLoadHardeningPass());
-  addPass(createprintAfterRegAlloc());
 }
 
 void X86PassConfig::addPreSched2() {
@@ -664,5 +663,7 @@ bool X86PassConfig::addRegAssignAndRewriteOptimized() {
     addPass(createGreedyRegisterAllocator(onlyAllocateTileRegisters));
     addPass(createX86TileConfigPass());
   }
-  return TargetPassConfig::addRegAssignAndRewriteOptimized();
+  bool result = TargetPassConfig::addRegAssignAndRewriteOptimized();
+  addPass(createprintAfterRegAlloc());
+  return result;
 }
