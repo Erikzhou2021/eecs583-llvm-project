@@ -3,13 +3,16 @@ import torch.nn as nn
 import math
 # from tokenize_bb import *
 import pandas as pd
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, random_split
 from torch.nn.utils.rnn import pad_sequence
 import csv
 from itertools import repeat
 import time
 from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
 
+
+torch.manual_seed(583)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # device = torch.device("cpu")
 print(device)
@@ -112,48 +115,27 @@ class TransformerModel(nn.Module):
         return (matrix == pad_token)
 
 
-def train_loop(model, opt, loss_fn, dataloader, scaler): 
+def train_loop(model, opt, loss_fn, dataloader, scaler, scheduler): 
     model.train()
     total_loss = 0
     
     for i, batch in enumerate(dataloader):
-        print(f"\rbatch {i + 1}/{len(dataloader)}", end="")
-        opt.zero_grad()
+        print(f"\rTrain batch {i + 1}/{len(dataloader)}", end="")
         X, y = batch
-        # print(X.shape)
-        # print(y.shape)
-        # X, y = batch[:, 0], batch[:, 1]
-        # X, y = [X], [y]
-        # X, y = torch.tensor(X, dtype=torch.int32).to(device), torch.tensor(y, dtype=torch.int32).to(device)
         X, y = X.to(device, non_blocking=True), y.to(device, non_blocking=True)
-        
-        # print(f"Memory allocated: {torch.cuda.memory_allocated() / 1e6:.2f} MB")
-        # print(f"Memory reserved: {torch.cuda.memory_reserved() / 1e6:.2f} MB")
 
         with torch.amp.autocast("cuda" if torch.cuda.is_available() else "cpu"):
             # Now we shift the tgt by one so with the <SOS> we predict the token at pos 1
             y_input = y[:, :-1]
             y_input = y_input.masked_fill(y_input == -1, 0)
             y_expected = y[:, 1:]
-            # print(y.device, y_input.device, y_expected.device)
             # Get mask to mask out the next words
             sequence_length = y_input.size(1)
             tgt_mask = model.get_tgt_mask(sequence_length).to(device)
             src_pad_mask = model.create_pad_mask(X, 0).to(device)
             tgt_pad_mask = model.create_pad_mask(y_input, 0).to(device)
 
-            # print(X.shape, y.shape)
-            # Standard training except we pass in y_input and tgt_mask
-            # pred = model(X, y_input, tgt_mask)
-            # pred = model(X, y_input)
             pred = model(X, y_input, tgt_mask=tgt_mask, src_pad_mask=src_pad_mask, tgt_pad_mask=tgt_pad_mask)
-
-            # Permute pred to have batch size first again
-            # print(pred.shape)
-            # pred = pred.permute(1, 2, 0) 
-            
-            # pred = pred.contiguous().view(-1, NUM_TOKENS)
-            # y_expected = y_expected.contiguous().view(-1)
             pred = pred.reshape(-1, OUTPUT_DIMS)
             y_expected = y_expected.reshape(-1)
             y_expected = y_expected.type(torch.LongTensor)
@@ -162,23 +144,63 @@ def train_loop(model, opt, loss_fn, dataloader, scaler):
             y_expected = y_expected.masked_fill(y_expected >= OUTPUT_DIMS, -1)
             # y_expected = y_expected.masked_fill(y_expected >= 4000, -1)
             
-            # print(pred.shape, pred.dtype)  
-            # print(y_expected.shape, y_expected.dtype)  
-            # print(pred.shape)
-            # loss = loss_fn(pred, y_expected)
             loss = loss_fn(pred, y_expected.to(device))
 
+        opt.zero_grad()
         scaler.scale(loss).backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         scaler.step(opt)
+        scheduler.step()
         scaler.update()
-        # loss.backward()
-        # opt.step()
     
         total_loss += loss.detach().item()
     print() 
     return total_loss / len(dataloader)
 
-def validation_loop(model, loss_fn, dataloader):
+
+def validation_loop(model, loss_fn, dataloader): 
+    model.eval()
+    total_loss = 0
+    
+    with torch.no_grad():
+        for i, batch in enumerate(dataloader):
+            print(f"\rValidation batch {i + 1}/{len(dataloader)}", end="")
+            # opt.zero_grad()
+            X, y = batch
+            X, y = X.to(device, non_blocking=True), y.to(device, non_blocking=True)
+
+            with torch.amp.autocast("cuda" if torch.cuda.is_available() else "cpu"):
+                # Now we shift the tgt by one so with the <SOS> we predict the token at pos 1
+                y_input = y[:, :-1]
+                y_input = y_input.masked_fill(y_input == -1, 0)
+                y_expected = y[:, 1:]
+                # Get mask to mask out the next words
+                sequence_length = y_input.size(1)
+                tgt_mask = model.get_tgt_mask(sequence_length).to(device)
+                src_pad_mask = model.create_pad_mask(X, 0).to(device)
+                tgt_pad_mask = model.create_pad_mask(y_input, 0).to(device)
+
+                pred = model(X, y_input, tgt_mask=tgt_mask, src_pad_mask=src_pad_mask, tgt_pad_mask=tgt_pad_mask)
+                pred = pred.reshape(-1, OUTPUT_DIMS)
+                y_expected = y_expected.reshape(-1)
+                y_expected = y_expected.type(torch.LongTensor)
+                
+                # pred = pred.masked_fill(pred >= 4000, -1)
+                y_expected = y_expected.masked_fill(y_expected >= OUTPUT_DIMS, -1)
+                # y_expected = y_expected.masked_fill(y_expected >= 4000, -1)
+                
+                loss = loss_fn(pred, y_expected.to(device))
+
+            # scaler.scale(loss).backward()
+            # scaler.step(opt)
+            # scaler.update()
+        
+            total_loss += loss.detach().item()
+    print() 
+    return total_loss / len(dataloader)
+
+
+def testing(model, loss_fn, dataloader):
     model.eval()
     # total_loss = 0
     total_acc = 0
@@ -228,28 +250,60 @@ def validation_loop(model, loss_fn, dataloader):
     # return total_acc
     return total_acc / len(dataloader)
 
-def train(model, opt, loss_fn, train_dataloader, val_dataloader, scaler, epochs):
+def train(model, opt, loss_fn, train_dataloader, val_dataloader, scaler, scheduler, epochs):
     # Used for plotting later on
     train_loss_list, validation_loss_list = [], []
+    max_patience = 10
+    curr_patience = 0
+    min_val_loss = 9999999999
     
     print("Training and validating model")
-    for epoch in range(epochs):
-        start = time.time()
-        print("-"*25, f"Epoch {epoch + 1}","-"*25)
+    if epochs != -1:
+        for epoch in range(epochs):
+            start = time.time()
+            print("-"*25, f"Epoch {epoch + 1}","-"*25)
+            print(f"lr = {scheduler.get_last_lr()[0]:.6f}")
+            
+            train_loss = train_loop(model, opt, loss_fn, train_dataloader, scaler, scheduler)
+            train_loss_list += [train_loss]
+            print(f"Training loss: {train_loss:.4f}")
+            print(f"{(time.time() - start):.02f} s")
+            
+            start = time.time()
+            validation_loss = validation_loop(model, loss_fn, val_dataloader)
+            validation_loss_list += [validation_loss]
+            print(f"Validation loss: {validation_loss:.4f}")
+            print(f"{(time.time() - start):.02f} s")
+            print()
+            torch.save(model.state_dict(), "weights_checkpoint.pt")
+        num_epochs = epochs
+    else: # patience
+        num_epochs = 0
+        while curr_patience < max_patience:
+            start = time.time()
+            print("-"*25, f"Epoch {num_epochs + 1}","-"*25)
+            print(f"lr = {scheduler.get_last_lr()[0]:.6f}")
+            
+            train_loss = train_loop(model, opt, loss_fn, train_dataloader, scaler, scheduler)
+            train_loss_list += [train_loss]
+            print(f"Training loss: {train_loss:.4f}")
+            print(f"{(time.time() - start):.02f} s")
+            
+            start = time.time()
+            validation_loss = validation_loop(model, loss_fn, val_dataloader)
+            validation_loss_list += [validation_loss]
+            print(f"Validation loss: {validation_loss:.4f}")
+            print(f"{(time.time() - start):.02f} s")
+            print()
+            if validation_loss < min_val_loss:
+                torch.save(model.state_dict(), "weights_best_val_loss.pt")
+                min_val_loss = validation_loss
+                curr_patience = 0
+            else:
+                curr_patience += 1
+            num_epochs += 1
         
-        train_loss = train_loop(model, opt, loss_fn, train_dataloader, scaler)
-        train_loss_list += [train_loss]
-        
-        # validation_loss = validation_loop(model, loss_fn, val_dataloader)
-        # validation_loss_list += [validation_loss]
-        
-        print(f"Training loss: {train_loss:.4f}")
-        print(f"{(time.time() - start):.02f} s")
-        # print(f"Validation loss: {validation_loss:.4f}")
-        print()
-        torch.save(model.state_dict(), "weights_checkpoint.pt")
-        
-    return train_loss_list, validation_loss_list
+    return train_loss_list, validation_loss_list, num_epochs
 
 def inference(model, X):
     y = [] # gets passed into the model
@@ -298,13 +352,36 @@ def collate_fn(batch):
     padded_labels = pad_sequence(labels, batch_first=True, padding_value=-1)  # Use a different padding value for labels
     return padded_sequences, padded_labels
 
-# def collate_fn(batch):
-#     sequences, labels = zip(*batch)
-#     sequences = [torch.tensor(sequence[:MAX_INPUT_LEN], dtype=torch.int32) for sequence in sequences]
-#     labels = [torch.tensor(label[:MAX_INPUT_LEN], dtype=torch.int32) for label in labels]
-#     padded_sequences = pad_sequence(sequences, batch_first=True, padding_value=0)
-#     padded_labels = pad_sequence(labels, batch_first=True, padding_value=-1)
-#     return padded_sequences, padded_labels
+
+def warmup_only_lr_scheduler(optimizer, warmup_steps):
+    def lr_lambda(step):
+        if step < warmup_steps:
+            return step / warmup_steps  # Linear warmup
+        return 1.0  # Keep LR constant after warmup
+    
+    return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
+
+
+def get_inverse_sqrt_scheduler(optimizer, d_model, warmup_steps):
+    def lr_lambda(step):
+        scale = d_model ** -0.5
+        return scale * min((step + 1) ** -0.5, (step + 1) * warmup_steps ** -1.5)
+    
+    return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
+
+
+def get_scheduler(optimizer, d_model, warmup_steps, min_lr=1e-5):
+    def lr_lambda(step):
+        # Linear warmup phase
+        if step < warmup_steps:
+            return step / warmup_steps  # Linear warmup
+        return 1.0
+        # scale = d_model ** -0.5
+        # lr_decay = scale * min((step + 1) ** -0.5, (step + 1) * warmup_steps ** -1.5)
+        # # Ensure the learning rate does not go below the minimum threshold
+        # return max(min_lr, lr_decay)
+
+    return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
 
 
 class RegisterAllocationDataset(Dataset):
@@ -317,12 +394,12 @@ class RegisterAllocationDataset(Dataset):
         with open("allDataInput.csv", mode="r") as file:
             reader = csv.reader(file)
             self.data = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
-            self.data = self.data[:6524]
+            # self.data = self.data[:128]
 
         with open("allDataLabels.csv", mode="r") as file:
             reader = csv.reader(file)
             self.labels = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
-            self.labels = self.labels[:6524]
+            # self.labels = self.labels[:128]
         
         # for sequence in self.data:
         #     assert all(0 <= token < NUM_TOKENS for token in sequence), "Token index out of range!"
@@ -372,23 +449,44 @@ class ValDataset(Dataset):
         return self.data[idx], self.labels[idx]
 
 if __name__ == "__main__":
+    batch_size = 8
+    epochs = -1
+
     torch.cuda.empty_cache()
+    torch.backends.cudnn.benchmark = True
     model = TransformerModel().to(device)
     # model.load_state_dict(torch.load("weights_8k.pt", weights_only=True))
-    torch.backends.cudnn.benchmark = True
-    trainData = RegisterAllocationDataset()
-    print(len(trainData))
+    
+    # load dataset
+    dataset = RegisterAllocationDataset()
+    # Define split sizes
+    train_size = int(0.8 * len(dataset))  # 80% for training
+    val_size = len(dataset) - train_size  # 20% for validation
+    # Split the dataset
+    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, collate_fn=collate_fn, pin_memory=True)
     valData = ValDataset()
-    loss = torch.nn.CrossEntropyLoss(ignore_index=-1)
-    optim = torch.optim.Adam(params=model.parameters(), lr=1e-4)
-    # print(sum(p.numel() for p in model.parameters()))
-    # exit(0)
-    trainLoader = DataLoader(trainData, batch_size=8, shuffle=True, collate_fn=collate_fn, pin_memory=True)
     valLoader = DataLoader(valData, batch_size=1, collate_fn=collate_fn)
+    
+    loss = torch.nn.CrossEntropyLoss(ignore_index=-1)
+    optim = torch.optim.AdamW(params=model.parameters(), lr=2e-4, weight_decay=1e-3)
+    warmup = int(0.05 * (30 * train_size / batch_size))
+    print(f"warmup steps: {warmup}")
+    # scheduler = warmup_only_lr_scheduler(optim, warmup_steps=warmup)
+    scheduler = get_scheduler(optim, 512, warmup)
+    
     scaler = torch.amp.GradScaler()
-    # print(validation_loop(model, None, valLoader))
-    train(model, optim, loss, trainLoader, trainLoader, scaler, epochs=20)
+    train_loss, val_loss, epochs = train(model, optim, loss, train_loader, val_loader, scaler, scheduler, epochs=epochs)
+    
+    plt.plot(range(epochs), train_loss, label="Train")
+    plt.plot(range(epochs), val_loss, label="Validation")
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.title("Training and Validation Loss")
+    plt.legend()
+    plt.savefig("loss.png")
     # torch.save(model.state_dict(), "weights.pt")
     
     # model.load_state_dict(torch.load("weights_8k.pt", weights_only=True))
-    print(validation_loop(model, None, valLoader))
+    print(testing(model, None, valLoader))
