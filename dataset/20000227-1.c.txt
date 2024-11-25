@@ -1,0 +1,13 @@
+20000227-1.c
+3000$  Instruction: $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: RET 0, $eax
+
+RET|3459:22 
+~
+3000$  Instruction: $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: RET 0, killed $eax
+
+RET|3459:22 
+&

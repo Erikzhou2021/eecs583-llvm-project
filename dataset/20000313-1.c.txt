@@ -1,0 +1,41 @@
+20000313-1.c
+3000$  Instruction: %0:gr64 = COPY $rdi
+
+COPY|19:1000,55   Instruction: %1:gr32 = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:1001,28   Instruction: CMP32rm %1:gr32, %0:gr64, 1, $noreg, 0, $noreg, implicit-def $eflags :: (load (s32) from %ir.0, !tbaa !5)
+
+CMP32rm|1159:1001,1000,28   Instruction: %3:gr32 = SBB32rr %1:gr32(tied-def 0), %1:gr32, implicit-def dead $eflags, implicit $eflags
+
+SBB32rr|3913:1003,1001,1001,28,28   Instruction: MOV32mi %0:gr64, 1, $noreg, 0, $noreg, 0 :: (store (s32) into %ir.0, !tbaa !5)
+
+MOV32mi|2360:1000   Instruction: $eax = COPY %3:gr32
+
+COPY|19:22,1003   Instruction: RET 0, $eax
+
+RET|3459:22 
+~
+3000$  Instruction: renamable $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: CMP32rm renamable $eax, renamable $rdi, 1, $noreg, 0, $noreg, implicit-def $eflags :: (load (s32) from %ir.0, !tbaa !5)
+
+CMP32rm|1159:22,55,28   Instruction: renamable $eax = SBB32rr killed renamable $eax(tied-def 0), renamable $eax, implicit-def dead $eflags, implicit killed $eflags
+
+SBB32rr|3913:22,22,22,28,28   Instruction: MOV32mi killed renamable $rdi, 1, $noreg, 0, $noreg, 0 :: (store (s32) into %ir.0, !tbaa !5)
+
+MOV32mi|2360:55   Instruction: RET 0, $eax
+
+RET|3459:22 
+&
+3000$  Instruction: $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: RET 0, $eax
+
+RET|3459:22 
+~
+3000$  Instruction: $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: RET 0, killed $eax
+
+RET|3459:22 
+&

@@ -1,0 +1,43 @@
+20000603-1.c
+3000$  Instruction: %1:gr64 = COPY $rsi
+
+COPY|19:1001,60   Instruction: %0:gr64 = COPY $rdi
+
+COPY|19:1000,55   Instruction: %2:gr64 = MOV64ri 4607182418800017408
+
+MOV64ri|2384:1002   Instruction: MOV64mr %0:gr64, 1, $noreg, 0, $noreg, killed %2:gr64 :: (store (s64) into %ir.0, !tbaa !5)
+
+MOV64mr|2379:1000,1002   Instruction: %3:fr64 = MOVSDrm_alt %1:gr64, 1, $noreg, 0, $noreg :: (load (s64) from %ir.1, !tbaa !10)
+
+MOVSDrm_alt|2477:1003,1001   Instruction: %4:fr64 = nofpexcept ADDSDrm %3:fr64(tied-def 0), $rip, 1, $noreg, %const.0, $noreg, implicit $mxcsr :: (load (s64) from constant-pool)
+
+ADDSDrm|649:1004,1003,58,50   Instruction: $xmm0 = COPY %4:fr64
+
+COPY|19:135,1004   Instruction: RET 0, $xmm0
+
+RET|3459:135 
+~
+3000$  Instruction: renamable $rax = MOV64ri 4607182418800017408
+
+MOV64ri|2384:51   Instruction: MOV64mr killed renamable $rdi, 1, $noreg, 0, $noreg, killed renamable $rax :: (store (s64) into %ir.0, !tbaa !5)
+
+MOV64mr|2379:55,51   Instruction: renamable $xmm0 = MOVSDrm_alt killed renamable $rsi, 1, $noreg, 0, $noreg :: (load (s64) from %ir.1, !tbaa !10)
+
+MOVSDrm_alt|2477:135,60   Instruction: renamable $xmm0 = nofpexcept ADDSDrm killed renamable $xmm0(tied-def 0), $rip, 1, $noreg, %const.0, $noreg, implicit $mxcsr :: (load (s64) from constant-pool)
+
+ADDSDrm|649:135,135,58,50   Instruction: RET 0, $xmm0
+
+RET|3459:135 
+&
+3000$  Instruction: $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: RET 0, $eax
+
+RET|3459:22 
+~
+3000$  Instruction: $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: RET 0, killed $eax
+
+RET|3459:22 
+&

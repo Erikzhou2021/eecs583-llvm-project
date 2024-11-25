@@ -1,0 +1,73 @@
+20000217-1.c
+3000$  Instruction: %1:gr64 = COPY $rsi
+
+COPY|19:1001,60   Instruction: %0:gr64 = COPY $rdi
+
+COPY|19:1000,55   Instruction: %2:gr16 = MOV16rm %1:gr64, 1, $noreg, 0, $noreg :: (load (s16) from %ir.1, !tbaa !5)
+
+MOV16rm|2349:1002,1001   Instruction: %3:gr16 = ADD16rm %2:gr16(tied-def 0), %0:gr64, 1, $noreg, 0, $noreg, implicit-def dead $eflags :: (load (s16) from %ir.0, !tbaa !5)
+
+ADD16rm|513:1003,1002,1000,28   Instruction: %5:gr32 = IMPLICIT_DEF
+
+IMPLICIT_DEF|10:1005   Instruction: %4:gr32 = INSERT_SUBREG %5:gr32(tied-def 0), killed %3:gr16, %subreg.sub_16bit
+
+INSERT_SUBREG|9:1004,1005,1003   Instruction: %6:gr32 = ADD32ri %4:gr32(tied-def 0), -8, implicit-def dead $eflags
+
+ADD32ri|544:1006,1004,28   Instruction: %7:gr16 = COPY %6.sub_16bit:gr32
+
+COPY|19:1007,1006   Instruction: MOV16mr %0:gr64, 1, $noreg, 0, $noreg, %7:gr16 :: (store (s16) into %ir.0, !tbaa !5)
+
+MOV16mr|2342:1000,1007   Instruction: CMP16ri %7:gr16, 8, implicit-def $eflags
+
+CMP16ri|1148:1007,28   Instruction: %9:gr8 = SETCCr 3, implicit $eflags
+
+SETCCr|3977:1009,28   Instruction: %10:gr32 = MOVZX32rr8 killed %9:gr8
+
+MOVZX32rr8|2531:1010,1009   Instruction: %11:gr16 = COPY %10.sub_16bit:gr32
+
+COPY|19:1011,1010   Instruction: $ax = COPY %11:gr16
+
+COPY|19:3,1011   Instruction: RET 0, $ax
+
+RET|3459:3 
+~
+3000$  Instruction: renamable $cx = MOV16rm killed renamable $rsi, 1, $noreg, 0, $noreg, implicit-def $ecx :: (load (s16) from %ir.1, !tbaa !5)
+
+MOV16rm|2349:13,60,25   Instruction: renamable $cx = ADD16rm renamable $cx(tied-def 0), renamable $rdi, 1, $noreg, 0, $noreg, implicit-def dead $eflags, implicit killed $ecx, implicit-def $ecx :: (load (s16) from %ir.0, !tbaa !5)
+
+ADD16rm|513:13,13,55,28,25,25   Instruction: renamable $ecx = ADD32ri killed renamable $ecx(tied-def 0), -8, implicit-def dead $eflags
+
+ADD32ri|544:25,25,28   Instruction: MOV16mr killed renamable $rdi, 1, $noreg, 0, $noreg, renamable $cx :: (store (s16) into %ir.0, !tbaa !5)
+
+MOV16mr|2342:55,13   Instruction: renamable $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: CMP16ri renamable $cx, 8, implicit-def $eflags, implicit killed $ecx
+
+CMP16ri|1148:13,28,25   Instruction: renamable $al = SETCCr 3, implicit killed $eflags, implicit killed $eax, implicit-def $eax
+
+SETCCr|3977:2,28,22,22   Instruction: $ax = KILL renamable $ax, implicit killed $eax
+
+KILL|7:3,3,22   Instruction: RET 0, $ax
+
+RET|3459:3 
+&
+3000$  Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $edi = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:26,28   Instruction: CALL64pcrel32 target-flags(x86-plt) @exit, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $edi, implicit-def $rsp, implicit-def $ssp
+
+CALL64pcrel32|1052:61,69,26,61,69   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69 
+~
+3000$  Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $edi = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:26,28   Instruction: CALL64pcrel32 target-flags(x86-plt) @exit, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $edi, implicit-def $rsp, implicit-def $ssp
+
+CALL64pcrel32|1052:61,69,26,61,69   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69 
+&

@@ -34,7 +34,7 @@ bool PrintAfterRegAlloc::runOnMachineFunction(MachineFunction &MF) {
     for (auto &MBB : MF) {
         errs() << MBB.getNumber() + 3000 << "$";
         for (auto &MI : MBB) { // for each instruction in the basic block
-            // errs() << "  Instruction: " << MI << "\n";
+            errs() << "  Instruction: " << MI << "\n";
             errs() << TII->getName(MI.getOpcode()) << "|";
             errs() << MI.getOpcode() << ":";
             bool printed = false;

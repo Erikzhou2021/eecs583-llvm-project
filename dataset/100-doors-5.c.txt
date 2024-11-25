@@ -1,0 +1,259 @@
+100-doors-5.c
+3000$  Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: %0:gr64 = MOV32ri64 @.str
+
+MOV32ri64|318:1000   Instruction: %1:gr32 = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:1001,28   Instruction: %2:gr8 = COPY %1.sub_8bit:gr32
+
+COPY|19:1002,1001   Instruction: $rdi = COPY %0:gr64
+
+COPY|19:55,1000   Instruction: $esi = MOV32ri 1
+
+MOV32ri|2367:32   Instruction: $al = COPY %2:gr8
+
+COPY|19:2,1002   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = COPY %0:gr64
+
+COPY|19:55,1000   Instruction: $esi = MOV32ri 4
+
+MOV32ri|2367:32   Instruction: $al = COPY %2:gr8
+
+COPY|19:2,1002   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = COPY %0:gr64
+
+COPY|19:55,1000   Instruction: $esi = MOV32ri 9
+
+MOV32ri|2367:32   Instruction: $al = COPY %2:gr8
+
+COPY|19:2,1002   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = COPY %0:gr64
+
+COPY|19:55,1000   Instruction: $esi = MOV32ri 16
+
+MOV32ri|2367:32   Instruction: $al = COPY %2:gr8
+
+COPY|19:2,1002   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = COPY %0:gr64
+
+COPY|19:55,1000   Instruction: $esi = MOV32ri 25
+
+MOV32ri|2367:32   Instruction: $al = COPY %2:gr8
+
+COPY|19:2,1002   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = COPY %0:gr64
+
+COPY|19:55,1000   Instruction: $esi = MOV32ri 36
+
+MOV32ri|2367:32   Instruction: $al = COPY %2:gr8
+
+COPY|19:2,1002   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = COPY %0:gr64
+
+COPY|19:55,1000   Instruction: $esi = MOV32ri 49
+
+MOV32ri|2367:32   Instruction: $al = COPY %2:gr8
+
+COPY|19:2,1002   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = COPY %0:gr64
+
+COPY|19:55,1000   Instruction: $esi = MOV32ri 64
+
+MOV32ri|2367:32   Instruction: $al = COPY %2:gr8
+
+COPY|19:2,1002   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = COPY %0:gr64
+
+COPY|19:55,1000   Instruction: $esi = MOV32ri 81
+
+MOV32ri|2367:32   Instruction: $al = COPY %2:gr8
+
+COPY|19:2,1002   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = COPY %0:gr64
+
+COPY|19:55,1000   Instruction: $esi = MOV32ri 100
+
+MOV32ri|2367:32   Instruction: $al = COPY %2:gr8
+
+COPY|19:2,1002   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: RET 0, $eax
+
+RET|3459:22 
+~
+3000$  Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = MOV32ri64 @.str
+
+MOV32ri64|318:55   Instruction: $esi = MOV32ri 1
+
+MOV32ri|2367:32   Instruction: dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+
+MOV32r0|315:22,28,2   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $rdi, implicit killed $esi, implicit killed $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = MOV32ri64 @.str
+
+MOV32ri64|318:55   Instruction: $esi = MOV32ri 4
+
+MOV32ri|2367:32   Instruction: dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+
+MOV32r0|315:22,28,2   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $rdi, implicit killed $esi, implicit killed $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = MOV32ri64 @.str
+
+MOV32ri64|318:55   Instruction: $esi = MOV32ri 9
+
+MOV32ri|2367:32   Instruction: dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+
+MOV32r0|315:22,28,2   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $rdi, implicit killed $esi, implicit killed $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = MOV32ri64 @.str
+
+MOV32ri64|318:55   Instruction: $esi = MOV32ri 16
+
+MOV32ri|2367:32   Instruction: dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+
+MOV32r0|315:22,28,2   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $rdi, implicit killed $esi, implicit killed $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = MOV32ri64 @.str
+
+MOV32ri64|318:55   Instruction: $esi = MOV32ri 25
+
+MOV32ri|2367:32   Instruction: dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+
+MOV32r0|315:22,28,2   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $rdi, implicit killed $esi, implicit killed $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = MOV32ri64 @.str
+
+MOV32ri64|318:55   Instruction: $esi = MOV32ri 36
+
+MOV32ri|2367:32   Instruction: dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+
+MOV32r0|315:22,28,2   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $rdi, implicit killed $esi, implicit killed $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = MOV32ri64 @.str
+
+MOV32ri64|318:55   Instruction: $esi = MOV32ri 49
+
+MOV32ri|2367:32   Instruction: dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+
+MOV32r0|315:22,28,2   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $rdi, implicit killed $esi, implicit killed $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = MOV32ri64 @.str
+
+MOV32ri64|318:55   Instruction: $esi = MOV32ri 64
+
+MOV32ri|2367:32   Instruction: dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+
+MOV32r0|315:22,28,2   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $rdi, implicit killed $esi, implicit killed $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = MOV32ri64 @.str
+
+MOV32ri64|318:55   Instruction: $esi = MOV32ri 81
+
+MOV32ri|2367:32   Instruction: dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+
+MOV32r0|315:22,28,2   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $rdi, implicit killed $esi, implicit killed $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = MOV32ri64 @.str
+
+MOV32ri64|318:55   Instruction: $esi = MOV32ri 100
+
+MOV32ri|2367:32   Instruction: dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+
+MOV32r0|315:22,28,2   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $rdi, implicit killed $esi, implicit killed $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+
+CALL64pcrel32|1052:61,69,55,32,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: RET 0, killed $eax
+
+RET|3459:22 
+&

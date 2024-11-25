@@ -1,0 +1,71 @@
+20000412-3.c
+3000$  Instruction: $eax = MOV32ri 96
+
+MOV32ri|2367:22   Instruction: RET 0, $eax
+
+RET|3459:22 
+~
+3000$  Instruction: $eax = MOV32ri 96
+
+MOV32ri|2367:22   Instruction: RET 0, killed $eax
+
+RET|3459:22 
+&
+3000$  Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $edi = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:26,28   Instruction: CALL64pcrel32 target-flags(x86-plt) @exit, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $edi, implicit-def $rsp, implicit-def $ssp
+
+CALL64pcrel32|1052:61,69,26,61,69   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69 
+~
+3000$  Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $edi = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:26,28   Instruction: CALL64pcrel32 target-flags(x86-plt) @exit, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $edi, implicit-def $rsp, implicit-def $ssp
+
+CALL64pcrel32|1052:61,69,26,61,69   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69 
+&
+3000$  Instruction: %0:gr8 = MOV8rm %fixed-stack.1, 1, $noreg, 0, $noreg :: (dereferenceable load (s8) from %ir.0, align 16, !tbaa !5)
+
+MOV8rm|2405:1000   Instruction: %1:gr32 = MOVSX32rm8 %fixed-stack.1, 1, $noreg, 1, $noreg :: (dereferenceable load (s8) from %ir.6)
+
+MOVSX32rm8|2502:1001   Instruction: %2:gr32 = MOVSX32rm8 %fixed-stack.0, 1, $noreg, 1, $noreg :: (dereferenceable load (s8) from %ir.9)
+
+MOVSX32rm8|2502:1002   Instruction: %3:gr32 = nsw ADD32rr %2:gr32(tied-def 0), killed %1:gr32, implicit-def dead $eflags
+
+ADD32rr|559:1003,1002,1001,28   Instruction: CMP8rm %0:gr8, %fixed-stack.0, 1, $noreg, 0, $noreg, implicit-def $eflags :: (dereferenceable load (s8) from %ir.1, align 8, !tbaa !5)
+
+CMP8rm|1177:1000,28   Instruction: %5:gr32 = MOV32ri 70
+
+MOV32ri|2367:1005   Instruction: %6:gr32 = CMOV32rr %5:gr32(tied-def 0), killed %3:gr32, 4, implicit $eflags
+
+CMOV32rr|1084:1006,1005,1003,28   Instruction: $eax = COPY %6:gr32
+
+COPY|19:22,1006   Instruction: RET 0, $eax
+
+RET|3459:22 
+~
+3000$  Instruction: renamable $al = MOV8rm %fixed-stack.1, 1, $noreg, 0, $noreg :: (dereferenceable load (s8) from %ir.0, align 16, !tbaa !5)
+
+MOV8rm|2405:2   Instruction: renamable $ecx = MOVSX32rm8 %fixed-stack.1, 1, $noreg, 1, $noreg :: (dereferenceable load (s8) from %ir.6)
+
+MOVSX32rm8|2502:25   Instruction: renamable $edx = MOVSX32rm8 %fixed-stack.0, 1, $noreg, 1, $noreg :: (dereferenceable load (s8) from %ir.9)
+
+MOVSX32rm8|2502:27   Instruction: renamable $edx = nsw ADD32rr killed renamable $edx(tied-def 0), killed renamable $ecx, implicit-def dead $eflags
+
+ADD32rr|559:27,27,25,28   Instruction: CMP8rm killed renamable $al, %fixed-stack.0, 1, $noreg, 0, $noreg, implicit-def $eflags :: (dereferenceable load (s8) from %ir.1, align 8, !tbaa !5)
+
+CMP8rm|1177:2,28   Instruction: renamable $eax = MOV32ri 70
+
+MOV32ri|2367:22   Instruction: renamable $eax = CMOV32rr killed renamable $eax(tied-def 0), killed renamable $edx, 4, implicit killed $eflags
+
+CMOV32rr|1084:22,22,27,28   Instruction: RET 0, $eax
+
+RET|3459:22 
+&

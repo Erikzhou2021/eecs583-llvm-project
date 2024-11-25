@@ -5,6 +5,7 @@ virtual registers: 1000 - 2000
 basic block numbers: 3000 - 4000
 op codes: 4000+
 """
+opcodes = []
 import glob
 
 def tokenize_inst(inst, only_reg=True, include_tags=False):
@@ -15,6 +16,8 @@ def tokenize_inst(inst, only_reg=True, include_tags=False):
     opcode = int(opcode.split("|")[1])
     if opcode == 19: return []
     opcode += 4000
+    global opcodes
+    opcodes.append(str(opcode))
     if not only_reg: tokens.append(opcode)
     if registers != '':
         registers = registers.split(",")
@@ -24,6 +27,8 @@ def tokenize_inst(inst, only_reg=True, include_tags=False):
 def tokenize_bb(bb, only_reg=True, include_tags=True):
     tokens = []
     if include_tags:
+        if bb.strip(" ") == "":
+            return tokens
         block_number, bb = bb.strip(" ").split("$")
         tokens.append(int(block_number))
     instructions = bb.strip(" ").split(" ")
@@ -55,8 +60,14 @@ def tokenized_format(input_file, state="post", only_reg=True):
 
         for txt in passes:
             txt = txt.strip()
+            if len(txt.split(".c\n")) < 2:
+                continue
             if txt == "":
                 continue
+            global opcodes
+            # print(txt)
+            name, txt = txt.split(".c\n", 1)
+            opcodes.append(name)
             bb_tokens = []
             pre, post = txt.split('~')
             # post = txt.split('~')
@@ -67,6 +78,7 @@ def tokenized_format(input_file, state="post", only_reg=True):
             for bb in basic_blocks:
                 bb_tokens += tokenize_bb(bb, only_reg=only_reg)
             allTokens.append(bb_tokens)
+            opcodes.append("\n")
     return allTokens
         
 
@@ -88,6 +100,11 @@ with open("allDataInput.csv", "w") as f:
             f.write(",".join([str(i) for i in bb_tokens]))
             f.write('\n')
 
+with open("sanityCheckPre.txt", "w") as f:
+    f.write(",".join(opcodes))
+
+opcodes = []
+
 with open("allDataLabels.csv", "w") as f:
     for path in file_paths:
         tokens = tokenized_format(path, state="post", only_reg=False)
@@ -96,6 +113,8 @@ with open("allDataLabels.csv", "w") as f:
             f.write(",".join([str(i) for i in bb_tokens]))
             f.write('\n')
     
+with open("sanityCheckPost.txt", "w") as f:
+    f.write(",".join(opcodes))
 
 # bb_tokens = tokenized_format("../hw2bench/hw2correct1.c.txt", only_reg=True)
 # print(bb_tokens)

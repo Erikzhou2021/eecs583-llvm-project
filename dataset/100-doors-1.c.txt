@@ -1,0 +1,237 @@
+100-doors-1.c
+3000$  Instruction: %14:vr128 = V_SET0
+
+V_SET0|360:1014   Instruction: MOVAPSmr %stack.0, 1, $noreg, 80, $noreg, %14:vr128 :: (store (s128) into %ir.1 + 80)
+
+MOVAPSmr|2414:1014   Instruction: MOVAPSmr %stack.0, 1, $noreg, 64, $noreg, %14:vr128 :: (store (s128) into %ir.1 + 64)
+
+MOVAPSmr|2414:1014   Instruction: MOVAPSmr %stack.0, 1, $noreg, 48, $noreg, %14:vr128 :: (store (s128) into %ir.1 + 48)
+
+MOVAPSmr|2414:1014   Instruction: MOVAPSmr %stack.0, 1, $noreg, 32, $noreg, %14:vr128 :: (store (s128) into %ir.1 + 32)
+
+MOVAPSmr|2414:1014   Instruction: MOVAPSmr %stack.0, 1, $noreg, 16, $noreg, %14:vr128 :: (store (s128) into %ir.1 + 16)
+
+MOVAPSmr|2414:1014   Instruction: MOVAPSmr %stack.0, 1, $noreg, 0, $noreg, %14:vr128 :: (store (s128) into %ir.1)
+
+MOVAPSmr|2414:1014   Instruction: MOV32mi %stack.0, 1, $noreg, 96, $noreg, 0 :: (store (s32) into %ir.1 + 96, align 16)
+
+MOV32mi|2360:   Instruction: %12:gr64 = MOV32ri64 1
+
+MOV32ri64|318:1012   Instruction: %15:gr32 = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:1015,28   Instruction: %13:gr64 = SUBREG_TO_REG 0, killed %15:gr32, %subreg.sub_32bit
+
+SUBREG_TO_REG|11:1013,1015 
+3001$  Instruction: %0:gr64 = PHI %12:gr64, %bb.0, %9:gr64, %bb.5
+
+PHI|0:1000,1012,1009   Instruction: %1:gr64 = PHI %13:gr64, %bb.0, %8:gr64, %bb.5
+
+PHI|0:1001,1013,1008 
+3002$  Instruction: %2:gr64_nosp = PHI %1:gr64, %bb.1, %3:gr64, %bb.2
+
+PHI|0:1002,1001,1003   Instruction: CMP8mi %stack.0, 1, %2:gr64_nosp, 0, $noreg, 0, implicit-def $eflags :: (load (s8) from %ir.scevgep1, !tbaa !5)
+
+CMP8mi|1172:1002,28   Instruction: SETCCm %stack.0, 1, %2:gr64_nosp, 0, $noreg, 4, implicit $eflags :: (store (s8) into %ir.scevgep1, !tbaa !5)
+
+SETCCm|3976:1002,28   Instruction: %3:gr64 = nuw nsw ADD64rr %2:gr64_nosp(tied-def 0), %0:gr64, implicit-def dead $eflags
+
+ADD64rr|600:1003,1002,1000,28   Instruction: CMP64ri32 %3:gr64, 100, implicit-def $eflags
+
+CMP64ri32|1166:1003,28   Instruction: JCC_1 %bb.2, 2, implicit $eflags
+
+JCC_1|1799:3002,28   Instruction: JMP_1 %bb.3
+
+JMP_1|1819:3003 
+3003$  Instruction: %4:gr64 = OR64ri32 %1:gr64(tied-def 0), 1, implicit-def dead $eflags
+
+OR64ri32|2780:1004,1001,28   Instruction: %5:gr64 = nuw nsw INC64r %0:gr64(tied-def 0), implicit-def dead $eflags
+
+INC64r|1726:1005,1000,28 
+3004$  Instruction: %6:gr64_nosp = PHI %4:gr64, %bb.3, %7:gr64, %bb.4
+
+PHI|0:1006,1004,1007   Instruction: CMP8mi %stack.0, 1, %6:gr64_nosp, 0, $noreg, 0, implicit-def $eflags :: (load (s8) from %ir.scevgep2, !tbaa !5)
+
+CMP8mi|1172:1006,28   Instruction: SETCCm %stack.0, 1, %6:gr64_nosp, 0, $noreg, 4, implicit $eflags :: (store (s8) into %ir.scevgep2, !tbaa !5)
+
+SETCCm|3976:1006,28   Instruction: %7:gr64 = nuw nsw ADD64rr %6:gr64_nosp(tied-def 0), %5:gr64, implicit-def dead $eflags
+
+ADD64rr|600:1007,1006,1005,28   Instruction: CMP64ri32 %7:gr64, 100, implicit-def $eflags
+
+CMP64ri32|1166:1007,28   Instruction: JCC_1 %bb.4, 2, implicit $eflags
+
+JCC_1|1799:3004,28   Instruction: JMP_1 %bb.5
+
+JMP_1|1819:3005 
+3005$  Instruction: %8:gr64 = nuw nsw ADD64ri32 %1:gr64(tied-def 0), 2, implicit-def dead $eflags
+
+ADD64ri32|585:1008,1001,28   Instruction: %9:gr64 = nuw nsw ADD64ri32 %0:gr64(tied-def 0), 2, implicit-def dead $eflags
+
+ADD64ri32|585:1009,1000,28   Instruction: CMP64ri32 %8:gr64, 100, implicit-def $eflags
+
+CMP64ri32|1166:1008,28   Instruction: JCC_1 %bb.1, 5, implicit $eflags
+
+JCC_1|1799:3001,28   Instruction: JMP_1 %bb.6
+
+JMP_1|1819:3006 
+3006$  Instruction: %20:gr32 = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:1020,28   Instruction: %19:gr64 = SUBREG_TO_REG 0, %20:gr32, %subreg.sub_32bit
+
+SUBREG_TO_REG|11:1019,1020   Instruction: %25:gr64 = MOV32ri64 @.str
+
+MOV32ri64|318:1025   Instruction: %27:gr8 = COPY %20.sub_8bit:gr32
+
+COPY|19:1027,1020 
+3007$  Instruction: %10:gr64_nosp = PHI %19:gr64, %bb.6, %11:gr64, %bb.10
+
+PHI|0:1010,1019,1011   Instruction: CMP8mi %stack.0, 1, %10:gr64_nosp, 0, $noreg, 0, implicit-def $eflags :: (load (s8) from %ir.scevgep, !tbaa !5)
+
+CMP8mi|1172:1010,28   Instruction: %21:gr64 = MOV32ri64 @.str.2
+
+MOV32ri64|318:1021   Instruction: JCC_1 %bb.10, 4, implicit $eflags
+
+JCC_1|1799:3010,28 
+3009$  Instruction: %22:gr64 = MOV32ri64 @.str.1
+
+MOV32ri64|318:1022 
+3010$  Instruction: %23:gr64 = PHI %22:gr64, %bb.9, %21:gr64, %bb.7
+
+PHI|0:1023,1022,1021   Instruction: %11:gr64 = INC64r %10:gr64_nosp(tied-def 0), implicit-def dead $eflags
+
+INC64r|1726:1011,1010,28   Instruction: %24:gr32 = COPY %11.sub_32bit:gr64
+
+COPY|19:1024,1011   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = COPY %25:gr64
+
+COPY|19:55,1025   Instruction: $esi = COPY %24:gr32
+
+COPY|19:32,1024   Instruction: $rdx = COPY %23:gr64
+
+COPY|19:56,1023   Instruction: $al = COPY %27:gr8
+
+COPY|19:2,1027   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit $rdi, implicit $esi, implicit $rdx, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def $eax
+
+CALL64pcrel32|1052:61,69,55,32,56,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: CMP64ri32 %11:gr64, 100, implicit-def $eflags
+
+CMP64ri32|1166:1011,28   Instruction: JCC_1 %bb.7, 5, implicit $eflags
+
+JCC_1|1799:3007,28   Instruction: JMP_1 %bb.8
+
+JMP_1|1819:3008 
+3008$  Instruction: $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: RET 0, $eax
+
+RET|3459:22 
+~
+3000$  Instruction: renamable $xmm0 = V_SET0
+
+V_SET0|360:135   Instruction: MOVAPSmr %stack.0, 1, $noreg, 80, $noreg, renamable $xmm0 :: (store (s128) into %ir.1 + 80)
+
+MOVAPSmr|2414:135   Instruction: MOVAPSmr %stack.0, 1, $noreg, 64, $noreg, renamable $xmm0 :: (store (s128) into %ir.1 + 64)
+
+MOVAPSmr|2414:135   Instruction: MOVAPSmr %stack.0, 1, $noreg, 48, $noreg, renamable $xmm0 :: (store (s128) into %ir.1 + 48)
+
+MOVAPSmr|2414:135   Instruction: MOVAPSmr %stack.0, 1, $noreg, 32, $noreg, renamable $xmm0 :: (store (s128) into %ir.1 + 32)
+
+MOVAPSmr|2414:135   Instruction: MOVAPSmr %stack.0, 1, $noreg, 16, $noreg, renamable $xmm0 :: (store (s128) into %ir.1 + 16)
+
+MOVAPSmr|2414:135   Instruction: MOVAPSmr %stack.0, 1, $noreg, 0, $noreg, killed renamable $xmm0 :: (store (s128) into %ir.1)
+
+MOVAPSmr|2414:135   Instruction: MOV32mi %stack.0, 1, $noreg, 96, $noreg, 0 :: (store (s32) into %ir.1 + 96, align 16)
+
+MOV32mi|2360:   Instruction: renamable $rax = MOV32ri64 1
+
+MOV32ri64|318:51   Instruction: renamable $ecx = MOV32r0 implicit-def dead $eflags, implicit-def $rcx
+
+MOV32r0|315:25,28,54 
+3001$  Instruction: renamable $rdx = COPY renamable $rcx
+
+COPY|19:56,54 
+3002$  Instruction: CMP8mi %stack.0, 1, renamable $rdx, 0, $noreg, 0, implicit-def $eflags :: (load (s8) from %ir.scevgep1, !tbaa !5)
+
+CMP8mi|1172:56,28   Instruction: SETCCm %stack.0, 1, renamable $rdx, 0, $noreg, 4, implicit killed $eflags :: (store (s8) into %ir.scevgep1, !tbaa !5)
+
+SETCCm|3976:56,28   Instruction: renamable $rdx = nuw nsw ADD64rr killed renamable $rdx(tied-def 0), renamable $rax, implicit-def dead $eflags
+
+ADD64rr|600:56,56,51,28   Instruction: CMP64ri32 renamable $rdx, 100, implicit-def $eflags
+
+CMP64ri32|1166:56,28   Instruction: JCC_1 %bb.2, 2, implicit killed $eflags
+
+JCC_1|1799:3002,28   Instruction: JMP_1 %bb.3
+
+JMP_1|1819:3003 
+3003$  Instruction: renamable $rdx = COPY renamable $rcx
+
+COPY|19:56,54   Instruction: renamable $rdx = OR64ri32 killed renamable $rdx(tied-def 0), 1, implicit-def dead $eflags
+
+OR64ri32|2780:56,56,28   Instruction: renamable $rsi = LEA64r renamable $rax, 1, $noreg, 1, $noreg
+
+LEA64r|1951:60,51 
+3004$  Instruction: CMP8mi %stack.0, 1, renamable $rdx, 0, $noreg, 0, implicit-def $eflags :: (load (s8) from %ir.scevgep2, !tbaa !5)
+
+CMP8mi|1172:56,28   Instruction: SETCCm %stack.0, 1, renamable $rdx, 0, $noreg, 4, implicit killed $eflags :: (store (s8) into %ir.scevgep2, !tbaa !5)
+
+SETCCm|3976:56,28   Instruction: renamable $rdx = nuw nsw ADD64rr killed renamable $rdx(tied-def 0), renamable $rsi, implicit-def dead $eflags
+
+ADD64rr|600:56,56,60,28   Instruction: CMP64ri32 renamable $rdx, 100, implicit-def $eflags
+
+CMP64ri32|1166:56,28   Instruction: JCC_1 %bb.4, 2, implicit killed $eflags
+
+JCC_1|1799:3004,28   Instruction: JMP_1 %bb.5
+
+JMP_1|1819:3005 
+3005$  Instruction: renamable $rcx = nuw nsw ADD64ri32 killed renamable $rcx(tied-def 0), 2, implicit-def dead $eflags
+
+ADD64ri32|585:54,54,28   Instruction: renamable $rax = nuw nsw ADD64ri32 killed renamable $rax(tied-def 0), 2, implicit-def dead $eflags
+
+ADD64ri32|585:51,51,28   Instruction: CMP64ri32 renamable $rcx, 100, implicit-def $eflags
+
+CMP64ri32|1166:54,28   Instruction: JCC_1 %bb.1, 5, implicit killed $eflags
+
+JCC_1|1799:3001,28   Instruction: JMP_1 %bb.6
+
+JMP_1|1819:3006 
+3006$  Instruction: renamable $ebx = MOV32r0 implicit-def dead $eflags, implicit-def $rbx
+
+MOV32r0|315:24,28,53 
+3007$  Instruction: CMP8mi %stack.0, 1, renamable $rbx, 0, $noreg, 0, implicit-def $eflags :: (load (s8) from %ir.scevgep, !tbaa !5)
+
+CMP8mi|1172:53,28   Instruction: renamable $rdx = MOV32ri64 @.str.2
+
+MOV32ri64|318:56   Instruction: JCC_1 %bb.9, 4, implicit killed $eflags
+
+JCC_1|1799:3009,28 
+3008$  Instruction: renamable $rdx = MOV32ri64 @.str.1
+
+MOV32ri64|318:56 
+3009$  Instruction: renamable $rbx = INC64r killed renamable $rbx(tied-def 0), implicit-def dead $eflags
+
+INC64r|1726:53,53,28   Instruction: ADJCALLSTACKDOWN64 0, 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKDOWN64|683:61,28,69,61,69   Instruction: $rdi = MOV32ri64 @.str
+
+MOV32ri64|318:55   Instruction: $esi = COPY renamable $ebx
+
+COPY|19:32,24   Instruction: dead $eax = MOV32r0 implicit-def dead $eflags, implicit-def $al
+
+MOV32r0|315:22,28,2   Instruction: CALL64pcrel32 target-flags(x86-plt) @printf, <regmask $bh $bl $bp $bph $bpl $bx $ebp $ebx $hbp $hbx $rbp $rbx $r12 $r13 $r14 $r15 $r12b $r13b $r14b $r15b $r12bh $r13bh $r14bh $r15bh $r12d $r13d $r14d $r15d $r12w $r13w $r14w $r15w $r12wh and 3 more...>, implicit $rsp, implicit $ssp, implicit killed $rdi, implicit $esi, implicit $rdx, implicit $al, implicit-def $rsp, implicit-def $ssp, implicit-def dead $eax
+
+CALL64pcrel32|1052:61,69,55,32,56,2,61,69,22   Instruction: ADJCALLSTACKUP64 0, 0, implicit-def dead $rsp, implicit-def dead $eflags, implicit-def dead $ssp, implicit $rsp, implicit $ssp
+
+ADJCALLSTACKUP64|685:61,28,69,61,69   Instruction: CMP64ri32 renamable $rbx, 100, implicit-def $eflags
+
+CMP64ri32|1166:53,28   Instruction: JCC_1 %bb.7, 5, implicit killed $eflags
+
+JCC_1|1799:3007,28   Instruction: JMP_1 %bb.10
+
+JMP_1|1819:3010 
+3010$  Instruction: $eax = MOV32r0 implicit-def dead $eflags
+
+MOV32r0|315:22,28   Instruction: RET 0, $eax
+
+RET|3459:22 
+&
