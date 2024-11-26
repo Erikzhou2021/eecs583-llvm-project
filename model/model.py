@@ -118,9 +118,8 @@ class TransformerModel(nn.Module):
 def train_loop(model, opt, loss_fn, dataloader, scaler, scheduler): 
     model.train()
     total_loss = 0
-    
     for i, batch in enumerate(dataloader):
-        print(f"\rTrain batch {i + 1}/{len(dataloader)}", end="")
+        # print(f"\rTrain batch {i + 1}/{len(dataloader)}", end="")
         X, y = batch
         X, y = X.to(device, non_blocking=True), y.to(device, non_blocking=True)
 
@@ -146,7 +145,7 @@ def train_loop(model, opt, loss_fn, dataloader, scaler, scheduler):
             
             loss = loss_fn(pred, y_expected.to(device))
 
-        opt.zero_grad()
+        opt.zero_grad(set_to_none=True)
         scaler.scale(loss).backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         scaler.step(opt)
@@ -164,7 +163,7 @@ def validation_loop(model, loss_fn, dataloader):
     
     with torch.no_grad():
         for i, batch in enumerate(dataloader):
-            print(f"\rValidation batch {i + 1}/{len(dataloader)}", end="")
+            # print(f"\rValidation batch {i + 1}/{len(dataloader)}", end="")
             # opt.zero_grad()
             X, y = batch
             X, y = X.to(device, non_blocking=True), y.to(device, non_blocking=True)
@@ -201,6 +200,7 @@ def validation_loop(model, loss_fn, dataloader):
 
 
 def testing(model, loss_fn, dataloader):
+    print("Testing...")
     model.eval()
     # total_loss = 0
     total_acc = 0
@@ -257,12 +257,13 @@ def train(model, opt, loss_fn, train_dataloader, val_dataloader, scaler, schedul
     curr_patience = 0
     min_val_loss = 9999999999
     
-    print("Training and validating model")
+    print("Training and validating model...")
+    train_start = time.time()
     if epochs != -1:
         for epoch in range(epochs):
             start = time.time()
             print("-"*25, f"Epoch {epoch + 1}","-"*25)
-            print(f"lr = {scheduler.get_last_lr()[0]:.6f}")
+            # print(f"lr = {scheduler.get_last_lr()[0]:.6f}")
             
             train_loss = train_loop(model, opt, loss_fn, train_dataloader, scaler, scheduler)
             train_loss_list += [train_loss]
@@ -282,7 +283,7 @@ def train(model, opt, loss_fn, train_dataloader, val_dataloader, scaler, schedul
         while curr_patience < max_patience:
             start = time.time()
             print("-"*25, f"Epoch {num_epochs + 1}","-"*25)
-            print(f"lr = {scheduler.get_last_lr()[0]:.6f}")
+            # print(f"lr = {scheduler.get_last_lr()[0]:.6f}")
             
             train_loss = train_loop(model, opt, loss_fn, train_dataloader, scaler, scheduler)
             train_loss_list += [train_loss]
@@ -302,7 +303,8 @@ def train(model, opt, loss_fn, train_dataloader, val_dataloader, scaler, schedul
             else:
                 curr_patience += 1
             num_epochs += 1
-        
+    
+    print(f"Total training time: {(time.time() - train_start):.02f} s")
     return train_loss_list, validation_loss_list, num_epochs
 
 def inference(model, X):
@@ -331,15 +333,15 @@ def inference(model, X):
 
 def calcAccuracy(y, y_expected):
     count = 0
-    print()
+    # print()
     y, y_expected = y[0], y_expected[0]
-    print("LENGTH", len(y), len(y_expected))
-    print("y", y)
-    print("y_expected", [i.item() for i in y_expected])
-    for i in range(len(y_expected)):
+    # print("LENGTH", len(y), len(y_expected))
+    # print("y", y)
+    # print("y_expected", [i.item() for i in y_expected])
+    for i in range(min(len(y_expected), len(y))):
         if y[i] == y_expected[i].item():
             count += 1
-    return count / len(y_expected)
+    return count / len(y_expected) if len(y_expected) > 0 else 0
 
 def collate_fn(batch):
     sequences, labels = zip(*batch)  # Unpack inputs and labels
@@ -394,12 +396,14 @@ class RegisterAllocationDataset(Dataset):
         with open("allDataInput.csv", mode="r") as file:
             reader = csv.reader(file)
             self.data = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
-            self.data = self.data[:128]
+            # self.data = [list(map(float, row)) for row in reader]
+            # self.data = self.data[:1024]
 
         with open("allDataLabels.csv", mode="r") as file:
             reader = csv.reader(file)
             self.labels = [torch.tensor(list(map(float, row)), dtype=torch.int32) for row in reader]
-            self.labels = self.labels[:128]
+            # self.labels = [list(map(float, row)) for row in reader]
+            # self.labels = self.labels[:1024]
         
         # for sequence in self.data:
         #     assert all(0 <= token < NUM_TOKENS for token in sequence), "Token index out of range!"
@@ -428,6 +432,7 @@ class RegisterAllocationDataset(Dataset):
         #     "labels": outputs["input_ids"].squeeze(0),
         # }
         return self.data[idx], self.labels[idx]
+        # return torch.tensor(self.data[idx], dtype=torch.int32), torch.tensor(self.labels[idx], dtype=torch.int32)
 
 class ValDataset(Dataset):
     def __init__(self):
@@ -450,7 +455,7 @@ class ValDataset(Dataset):
 
 if __name__ == "__main__":
     batch_size = 8
-    epochs = 5
+    epochs = -1
 
     torch.cuda.empty_cache()
     torch.backends.cudnn.benchmark = True
@@ -477,16 +482,9 @@ if __name__ == "__main__":
     scheduler = get_scheduler(optim, 512, warmup)
     
     scaler = torch.amp.GradScaler()
-    train_loss, val_loss, epochs = train(model, optim, loss, train_loader, val_loader, scaler, scheduler, epochs=epochs)
+    # train_loss, val_loss, epochs = train(model, optim, loss, train_loader, val_loader, scaler, scheduler, epochs=epochs)
     
-    plt.plot(range(epochs), train_loss, label="Train")
-    plt.plot(range(epochs), val_loss, label="Validation")
-    plt.xlabel("Epochs")
-    plt.ylabel("Loss")
-    plt.title("Training and Validation Loss")
-    plt.legend()
-    plt.savefig("loss.png")
     # torch.save(model.state_dict(), "weights.pt")
     
-    # model.load_state_dict(torch.load("weights_8k.pt", weights_only=True))
-    print(testing(model, None, test_loader))
+    model.load_state_dict(torch.load("weights_best_val_loss.pt", weights_only=True))
+    print(f"Accuracy: {testing(model, None, test_loader)}")

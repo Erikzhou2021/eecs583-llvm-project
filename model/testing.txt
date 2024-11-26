@@ -1,0 +1,4 @@
+cuda
+warmup steps: 1223
+Testing...
+Accuracy: 0.8089054829177134
