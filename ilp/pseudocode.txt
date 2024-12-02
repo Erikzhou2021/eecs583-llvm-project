@@ -1,0 +1,66 @@
+Algorithm BuildILP(MachineFunction MF, LiveIntervals LIS, TargetRegisterInfo TRI)
+    Inputs:
+        MF - MachineFunction containing MIR
+        LIS - LiveIntervals for virtual registers
+        TRI - TargetRegisterInfo for physical registers
+
+    Outputs:
+        ILP_Problem - A data structure containing constraints and an objective function
+
+    Initialize ILP_Problem as empty
+    PhysicalRegisters ← TRI.getAvailableRegisters() ∪ {Stack}
+    BitWidth ← TRI.getRegisterBitWidth()
+
+    // Step 1: Define Objective Function
+    Objective ← 0
+    for each VirtualRegister v in LIS.getVirtRegs():
+        SpillCost ← GetSpillCost(v)
+        Add "SpillCost * x[v, Stack]" to Objective
+        for each PhysicalRegister r in PhysicalRegisters:
+            for each Instruction n in MF:
+                MoveCost ← GetMoveCost(v, r, n)
+                Add "MoveCost * c[v, r, n]" to Objective
+
+    ILP_Problem.setObjective(Objective)
+
+    // Step 2: Add Constraints
+    for each Instruction n in MF:
+        ActiveRanges ← GetActiveLiveRangesAtInstruction(LIS, n)
+
+        // Capacity Constraints
+        for each PhysicalRegister r in PhysicalRegisters except Stack:
+            CapacityConstraint ← 0
+            for each v in ActiveRanges:
+                CapacityConstraint += x[v, r] * BitWidth[v]
+            Add "CapacityConstraint <= BitWidth" to ILP_Problem
+
+        // Unique Assignment Constraints
+        for each v in ActiveRanges:
+            UniqueAssignment ← 0
+            for each r in PhysicalRegisters:
+                UniqueAssignment += x[v, r]
+            Add "UniqueAssignment == 1" to ILP_Problem
+
+        // Move Tracking Constraints
+        for each Edge (p, n) in ControlFlowGraph(MF):
+            for each v in ActiveRanges:
+                for each r in PhysicalRegisters:
+                    MoveConstraint1 ← x[v, r, n] - x[v, r, p] + c[v, r, n]
+                    MoveConstraint2 ← x[v, r, p] - x[v, r, n] + c[v, r, n]
+                    Add "MoveConstraint1 >= 0" to ILP_Problem
+                    Add "MoveConstraint2 >= 0" to ILP_Problem
+
+    // Step 3: Add Dead Temporary Constraints
+    for each VirtualRegister v in LIS.getVirtRegs():
+        for each Instruction n in MF:
+            if v is not live at n:
+                Add "x[v, *, n] == 0" to ILP_Problem
+
+    // Step 4: Add Zero-Cost Moves for Dead Temporaries
+    for each VirtualRegister v in LIS.getVirtRegs():
+        DisjointRanges ← GetDisjointLiveRanges(v)
+        for each pair of ranges (r1, r2) in DisjointRanges:
+            Add "c[v, *, *] == 0" for moves between r1 and r2 to ILP_Problem
+
+    // Step 5: Return ILP Problem
+    return ILP_Problem

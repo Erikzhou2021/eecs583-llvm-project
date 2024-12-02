@@ -31,40 +31,40 @@ public:
 char PrintBeforeRegAlloc::ID = 0;
 
 bool PrintBeforeRegAlloc::runOnMachineFunction(MachineFunction &MF) {
-    const llvm::TargetInstrInfo *TII = MF.getSubtarget().getInstrInfo();
-    for (auto &MBB : MF) {
-        errs() << MBB.getNumber() + 3000 << "$";
-        for (auto &MI : MBB) { // for each instruction in the basic block
-            // errs() << "  Instruction: " << MI << "\n";
-            errs() << TII->getName(MI.getOpcode()) << "|";
-            errs() << MI.getOpcode() << ":";
-            bool printed = false;
-            for (unsigned i = 0; i < MI.getNumOperands(); ++i) { // for each operand in the instruction
-                MachineOperand &MO = MI.getOperand(i);
-                if(MI.isBranch() && MO.isMBB()){
-                    if(printed){
-                        errs() << ",";
-                    }
-                    errs() << MO.getMBB()->getNumber() + 3000;
-                    printed = true;
-                }
-                if(MO.isReg() && MO.getReg().id() != 0){
-                    if(printed){
-                        errs() << ",";
-                    }
-                    if(MO.getReg().isVirtual()){
-                        errs() << MO.getReg().virtRegIndex() + 1000;
-                    }
-                    else{
-                        errs() << MO.getReg();
-                    }
-                    printed = true;
-                }
-            }
-            errs() << " ";
-        }
-        errs() << "\n";
-    }
+    // const llvm::TargetInstrInfo *TII = MF.getSubtarget().getInstrInfo();
+    // for (auto &MBB : MF) {
+    //     errs() << MBB.getNumber() + 3000 << "$";
+    //     for (auto &MI : MBB) { // for each instruction in the basic block
+    //         // errs() << "  Instruction: " << MI << "\n";
+    //         errs() << TII->getName(MI.getOpcode()) << "|";
+    //         errs() << MI.getOpcode() << ":";
+    //         bool printed = false;
+    //         for (unsigned i = 0; i < MI.getNumOperands(); ++i) { // for each operand in the instruction
+    //             MachineOperand &MO = MI.getOperand(i);
+    //             if(MI.isBranch() && MO.isMBB()){
+    //                 if(printed){
+    //                     errs() << ",";
+    //                 }
+    //                 errs() << MO.getMBB()->getNumber() + 3000;
+    //                 printed = true;
+    //             }
+    //             if(MO.isReg() && MO.getReg().id() != 0){
+    //                 if(printed){
+    //                     errs() << ",";
+    //                 }
+    //                 if(MO.getReg().isVirtual()){
+    //                     errs() << MO.getReg().virtRegIndex() + 1000;
+    //                 }
+    //                 else{
+    //                     errs() << MO.getReg();
+    //                 }
+    //                 printed = true;
+    //             }
+    //         }
+    //         errs() << " ";
+    //     }
+    //     errs() << "\n";
+    // }
 
     // const TargetInstrInfo *TII = MF.getSubtarget().getInstrInfo();
     // for (auto &MBB : MF) {

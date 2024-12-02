@@ -28,6 +28,9 @@ class X86TargetMachine;
 FunctionPass *createPrintBeforeRegAlloc();
 void initializePrintBeforeRegAllocPass(PassRegistry &);
 
+FunctionPass *createIlpInstance();
+void initializeIlpInstancePass(PassRegistry &);
+
 FunctionPass *createprintAfterRegAlloc();
 void initializePrintAfterRegAllocPass(PassRegistry &);
 

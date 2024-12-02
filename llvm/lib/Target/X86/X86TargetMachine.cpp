@@ -70,6 +70,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeX86Target() {
 
   PassRegistry &PR = *PassRegistry::getPassRegistry();
   initializePrintBeforeRegAllocPass(PR);
+  initializeIlpInstancePass(PR);
   initializePrintAfterRegAllocPass(PR);
   initializeX86LowerAMXIntrinsicsLegacyPassPass(PR);
   initializeX86LowerAMXTypeLegacyPassPass(PR);
@@ -656,6 +657,8 @@ static bool onlyAllocateTileRegisters(const TargetRegisterInfo &TRI,
 }
 
 bool X86PassConfig::addRegAssignAndRewriteOptimized() {
+  addPass(createIlpInstance());
+
   addPass(createPrintBeforeRegAlloc());
   // Don't support tile RA when RA is specified by command line "-regalloc".
   if (!isCustomizedRegAlloc() && EnableTileRAPass) {
